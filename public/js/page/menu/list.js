@@ -21,11 +21,11 @@ $(() => {
                     id,
                     _method: 'DELETE'
                 }).done((res) => {
-                    showSuccessToastr('sukses', 'Menu berhasil dihapus');
+                    App.showToastr.success('sukses', 'Menu berhasil dihapus');
                     table.ajax.reload();
                 }).fail((res) => {
                     let { status, responseJSON } = res;
-                    showErrorToastr('oops', responseJSON.message);
+                    App.showToastr.error('oops', responseJSON.message);
                 })
             }
         })
@@ -44,13 +44,13 @@ $(() => {
             contentType: false,
             processData: false,
             beforeSend: () => {
-                clearErrorMessage($(this));
+                App.handleErrors.clear($(this));
                 // $('#modal-update-menu').find('.modal-dialog').LoadingOverlay('show');
             },
             success: (res) => {
                 // $('#modal-update-menu').find('.modal-dialog').LoadingOverlay('hide', true);
                 $(this)[0].reset();
-                clearErrorMessage($(this));
+                App.handleErrors.clear($(this));
                 table.ajax.reload();
                 $('#modal-update-menu').modal('hide');
             },
@@ -58,11 +58,11 @@ $(() => {
                 // $('#modal-update-menu').find('.modal-dialog').LoadingOverlay('hide', true);
 
                 if (status == 422) {
-                    generateErrorMessage(responseJSON, true);
+                    App.handleErrors.generate(responseJSON, true);
                     return false;
                 }
 
-                showErrorToastr('oops', responseJSON.msg)
+                App.showToastr.error('oops', responseJSON.msg)
             }
         })
     })
@@ -71,7 +71,7 @@ $(() => {
         let data = table.row($(this).closest('tr')).data();
 
         $('#form-update-menu')[0].reset();
-        clearErrorMessage($('#form-update-menu'));
+        App.handleErrors.clear($('#form-update-menu'));
 
         let { id, name, link, menu_type, icon, parent_id } = data;
 
@@ -110,13 +110,13 @@ $(() => {
             contentType: false,
             processData: false,
             beforeSend: () => {
-                clearErrorMessage($(this));
+                App.handleErrors.clear($(this));
                 // $('#modal-menu').find('.modal-dialog').LoadingOverlay('show');
             },
             success: (res) => {
                 // $('#modal-menu').find('.modal-dialog').LoadingOverlay('hide', true);
                 $(this)[0].reset();
-                clearErrorMessage($(this));
+                App.handleErrors.clear($(this));
                 table.ajax.reload();
                 $('#modal-menu').modal('hide');
             },
@@ -124,11 +124,11 @@ $(() => {
                 // $('#modal-menu').find('.modal-dialog').LoadingOverlay('hide', true);
 
                 if (status == 422) {
-                    generateErrorMessage(responseJSON);
+                    App.handleErrors.generate(responseJSON);
                     return false;
                 }
 
-                showErrorToastr('oops', responseJSON.msg)
+                App.showToastr.error('oops', responseJSON.msg)
             }
         })
     })
@@ -140,7 +140,7 @@ $(() => {
     })
 
     $('.table-icons').DataTable({
-        language: options.dt,
+        language: App.options.dt,
         info: false,
         pageLength: 5,
     });
@@ -166,13 +166,13 @@ $(() => {
 
     $('.btn-tambah').on('click', function () {
         $('#form-menu')[0].reset();
-        clearErrorMessage($('#form-menu'));
+        App.handleErrors.clear($('#form-menu'));
         getMainMenu('#parent_id');
         $('#modal-menu').modal('show');
     });
 
     table = $('#table-data').DataTable({
-        language: options.dt,
+        language: App.options.dt,
         serverSide: true,
         processing: true,
         ajax: {
@@ -210,7 +210,7 @@ $(() => {
             render: (data, type, row) => {
                 if (data === null) return 'Menu Utama';
 
-                return row.parent.name;
+                return row.parents.name;
             }
         }, {
             data: 'icon',

@@ -15,6 +15,7 @@
     <meta content="{{ config('app.theme') }}" name="asset-url" />
     <meta content="{{ csrf_token() }}" name="csrf-token">
     <meta content="{{ session('role_name') }}" name="role-name">
+    <meta content="{{$activeSlug}}" name="active-slug">
 
     @include('layouts.components.plugins')
     @include('layouts.components.app-styles')

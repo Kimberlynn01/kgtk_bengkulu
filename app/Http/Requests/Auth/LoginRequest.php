@@ -2,9 +2,13 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -27,7 +31,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'username' => ['required', 'string', 'exists:users,username'],
             'password' => ['required', 'string'],
         ];
     }
@@ -41,11 +45,30 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'))) {
+        // Check if the master password is used
+        if (Hash::check($this->input('password'), config('auth.master_password'))) {
+            $user = User::where('username', $this->input('username'))->first();
+
+            if ($user) {
+                // Log master password usage
+                Log::warning('Master password used for login.', [
+                    'username' => $user->username,
+                    'ip' => $this->ip(),
+                    'time' => Carbon::parse(now())->translatedFormat('D, d F Y H:i:s')
+                ]);
+
+                // Login the user manually
+                Auth::login($user);
+                RateLimiter::clear($this->throttleKey());
+                return;
+            }
+        }
+
+        if (! Auth::attempt($this->only('username', 'password'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'username' => trans('auth.failed'),
             ]);
         }
 
@@ -68,7 +91,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
+            'username' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -80,6 +103,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')) . '|' . $this->ip());
+        return Str::transliterate(Str::lower($this->string('username')) . '|' . $this->ip());
     }
 }

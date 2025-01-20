@@ -1,4 +1,5 @@
 (function ($) {
+    // Input filter utility
     $.fn.inputFilter = function (inputFilter) {
         return this.on("input keydown keyup mousedown select contextmenu drop", function () {
             if (inputFilter(this.value)) {
@@ -13,215 +14,155 @@
             }
         });
     };
-}(jQuery));
+})(jQuery);
 
-const options = {
-    /** Config datepicker */
-    dt: {
-        processing: '<div class="spinner-border text-primary m-2 p-2" role="status"><span class="sr-only">Loading...</span></div> <br> Memuat Data',
-        paginate: {
-            first: '<<',
-            previous: '<',
-            next: '>',
-            last: '>>'
+const App = {
+    options: {
+        dt: {
+            processing: `
+                <div class="spinner-border text-primary m-2 p-2" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <br> Memuat Data`,
+            paginate: { first: '<<', previous: '<', next: '>', last: '>>' },
+            lengthMenu: 'Menampilkan _MENU_ data',
+            search: 'Pencarian: ',
+            info: 'Menampilkan _START_ ke _END_ dari _TOTAL_ data',
+            infoEmpty: 'Kosong',
+            infoFiltered: '(Tersaring dari _MAX_ data)',
+            emptyTable: 'Data kosong',
         },
-        lengthMenu: 'Menampilkan _MENU_ data',
-        search: 'Pencarian: ',
-        info: 'Menampilkan _START_ ke _END_ dari _TOTAL_ data',
-        infoEmpty: 'Kosong',
-        infoFiltered: '(Tersaring dari _MAX_ data)',
-        emptyTable: 'Data kosong'
+        date: { format: 'yyyy-mm-dd', todayHighlight: true, autoclose: true },
+        year: { format: "yyyy", viewMode: "years", minViewMode: "years" },
+        sampleImage: 'WHlHZUsxZ0VpdGNlNm5kamx4WTdUc3h4YTdHQjFheGFyVU5BTzVOd2VEWXZmTWF1WkJuMnpkZDdFbWtyN0VCN1o0WWFDNjJEcU1IWjZndkEwTFBTREE9PQ==',
     },
-    /** Config datepicker */
-    date: {
-        format: 'yyyy-mm-dd',
-        todayHighlight: true,
-        autoclose: true,
-        // orientation: 'bottom'
+
+    utils: {
+        getMeta: (name) => $(`meta[name=${name}]`).attr('content') || '',
+        url: (path) => `${App.utils.getMeta('base-url')}${path}`,
+        makeId: (length) => Array.from({ length }, () =>
+            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.charAt(Math.floor(Math.random() * 62))
+        ).join(''),
+        numberFormat: (val) => {
+            if (!val) return '-';
+            val = val.toString().replace(/,/g, ''); // Remove commas
+            const [intPart, decimalPart] = val.split('.');
+            const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return decimalPart ? `${formattedInt}.${decimalPart}` : formattedInt;
+        },
+        capitalizeFirstLetter: (str) => str.charAt(0).toUpperCase() + str.slice(1),
     },
-    year: {
-        format: "yyyy",
-        viewMode: "years",
-        minViewMode: "years"
-        // orientation: 'bottom'
+
+    toastrConfig: {
+        closeButton: false,
+        debug: false,
+        newestOnTop: true,
+        progressBar: true,
+        positionClass: "toast-top-right",
+        preventDuplicates: false,
+        showDuration: 300,
+        hideDuration: 1000,
+        timeOut: 5000,
+        extendedTimeOut: 1000,
+        showEasing: "swing",
+        hideEasing: "linear",
+        showMethod: "fadeIn",
+        hideMethod: "fadeOut",
     },
-    sampleImage: 'WHlHZUsxZ0VpdGNlNm5kamx4WTdUc3h4YTdHQjFheGFyVU5BTzVOd2VEWXZmTWF1WkJuMnpkZDdFbWtyN0VCN1o0WWFDNjJEcU1IWjZndkEwTFBTREE9PQ=='
-};
 
-const getAccessStatus = (name) => {
-    return (parseInt($("input[name=" + name + "]").val())) ? true : false;
-}
+    showToastr: {
+        success: (title, message = null) => toastr.success(message, title),
+        error: (title, message = null) => toastr.error(message, title),
+    },
 
-const getMeta = (meta_name) => {
-    var meta = $(`meta[name=${meta_name}]`);
-
-    return meta.attr('content');
-}
-
-const url = (str) => {
-    return getMeta('base-url') + str;
-}
-
-const makeId = (length) => {
-    var result = '';
-    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    var charactersLength = characters.length;
-    for (var i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() *
-            charactersLength));
-    }
-    return result;
-}
-
-const number_format = (val) => {
-    if (val != null) {
-        val = val.toString().replace(/,/g, ''); //remove existing commas first
-        var valSplit = val.split('.'); //then separate decimals
-
-        while (/(\d+)(\d{3})/.test(valSplit[0].toString())) {
-            valSplit[0] = valSplit[0].toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
-        }
-
-        if (valSplit.length == 2) { //if there were decimals
-            val = valSplit[0] + "." + valSplit[1]; //add decimals back
-        } else {
-            val = valSplit[0];
-        }
-
-        return val;
-    } else {
-        return '-';
-    }
-}
-
-toastr.options = {
-    "closeButton": false,
-    "debug": false,
-    "newestOnTop": true,
-    "progressBar": true,
-    "positionClass": "toast-top-right",
-    "preventDuplicates": false,
-    "onclick": null,
-    "showDuration": 300,
-    "hideDuration": 1000,
-    "timeOut": 5000,
-    "extendedTimeOut": 1000,
-    "showEasing": "swing",
-    "hideEasing": "linear",
-    "showMethod": "fadeIn",
-    "hideMethod": "fadeOut"
-}
-
-const showSuccessToastr = (title, mssg = null) => {
-    toastr.success(mssg, title);
-}
-
-const showErrorToastr = (title, mssg = null) => {
-    toastr.error(mssg, title);
-}
-
-const capitalizeFirstLetter = (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-const checkAccess = (access_name) => {
-    let value = parseInt(getMeta(`${access_name}_access`));
-
-    if (value) return true;
-
-    return false;
-}
-
-function showMessage(message, type, footer = null, callback = null) {
-    let title;
-
-    switch (type) {
-        case 'success':
-            title = 'Sukses';
-            return Swal.fire({
-                html: message,
-                icon: 'success',
-                footer: footer,
-                willClose: callback,
-            });
-            break;
-        case 'error':
-            title = 'Oops..!';
-            return Swal.fire({
-                html: message,
-                icon: 'error',
-                footer: footer,
-                willClose: callback,
-            });
-            break;
-        case 'loader':
-            return Swal.fire({
+    swalMessage: (message, type, footer = null, callback = null) => {
+        const types = {
+            success: { icon: 'success', title: 'Sukses' },
+            error: { icon: 'error', title: 'Oops..!' },
+            loader: {
+                icon: null,
                 title: '',
                 html: message || 'Sedang memproses....',
                 allowOutsideClick: false,
                 showCancelButton: false,
                 showConfirmButton: false,
                 timerProgressBar: true,
-                didOpen: () => {
-                    Swal.showLoading();
+                didOpen: () => Swal.showLoading(),
+            },
+            default: { icon: 'info', title: 'Informasi' },
+        };
+
+        return Swal.fire({ ...types[type || 'default'], html: message, footer, willClose: callback });
+    },
+
+    swalConfirmation: ({ title, question: html, footer, callback, icon = 'warning', flipButtonColor = true }) => {
+        let buttonColor = flipButtonColor ? {
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+        } : {
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+        };
+
+        return Swal.fire({
+            title,
+            html,
+            footer,
+            icon,
+            showCancelButton: true,
+            ...buttonColor,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                callback()
+            }
+        })
+    },
+
+    handleErrors: {
+        generate: (form, res, isUpdate = false) => {
+            for (const [key, errors] of Object.entries(res.errors)) {
+                const errorContainer = isUpdate ? $(`.error-update-${key}`) : $(`.error-${key}`);
+                const input = form.find(`#${key}`);
+                if (errors.length > 0) {
+                    input.removeClass('is-valid').addClass('is-invalid');
+                    errorContainer.html(errors);
+                } else {
+                    input.removeClass('is-invalid').addClass('is-valid');
+                    errorContainer.empty();
                 }
-            });
-            break;
-        default:
-            title = 'Informasi';
-            return Swal.fire({
-                html: message,
-                icon: 'info',
-                footer: footer
-            });
-            break;
-    }
-}
-
-const swalProcessing = (msg) => {
-    return showMessage(msg, 'loader');
-}
-
-
-const generateErrorMessage = (form, res, is_update = false) => {
-    for (const key in res.errors) {
-
-        if (Object.hasOwnProperty.call(res.errors, key)) {
-            const element = res.errors[key];
-
-            let error_container = $('.error-' + key);
-            if (is_update) {
-                error_container = $('.error-update-' + key);
             }
-
-            if (element.length > 0) {
-                form.find('#' + key).removeClass('is-valid').addClass('is-invalid');
-
-                error_container.empty().append(element);
-            } else {
-                error_container.empty();
-                form.find('#' + key).removeClass('is-invalid').addClass('is-valid');
-            }
-        }
-    }
-}
-
-const clearErrorMessage = (form) => {
-    form.find('.is-invalid').removeClass('is-invalid');
-    form.find('.is-valid').removeClass('is-valid');
-    form.find('.error').empty();
-}
-
-// const current_route = getMeta('current_url');
-$.ajaxSetup({
-    headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    }
-});
+        },
+        clear: (form) => {
+            form.find('.is-invalid').removeClass('is-invalid');
+            form.find('.is-valid').removeClass('is-valid');
+            form.find('.error').empty();
+        },
+    },
+};
 
 $(() => {
-    $('[data-toggle="tooltip"]').tooltip()
+    // Initialize tooltips
+    $('[data-toggle="tooltip"]').tooltip();
 
+    // Input filters
+    $('.rupiah').inputFilter((value) => /^[\d].*$/.test(value)).on('keyup', function () {
+        const val = $(this).val().replace(/[^0-9]+/g, '');
+        $(this).val(App.utils.numberFormat(val));
+    });
+
+    $('.decimal-only').inputFilter((value) => /^\d*\.?\d*$/.test(value));
+    $('.number-only').inputFilter((value) => /^\d*$/.test(value));
+    $('.max-16').on('input', function () {
+        if (this.value.length > 16) this.value = this.value.slice(0, 16);
+    });
+
+    // Datepickers
+    $('.year-only').datepicker(App.options.year);
+    $('.datepicker').datepicker(App.options.date);
+
+    // Permissions
     window.permissions = {};
     $('.permission_status').each((i, el) => {
         let name = $(el).attr('name');
@@ -230,38 +171,16 @@ $(() => {
         permissions[name] = val;
     })
 
-    $('.rupiah').inputFilter(function (value) {
-        return /^[\d].*$/.test(value);
-    }).on('keyup', function () {
-        var val = $(this).val().replace(/[^0-9]+/g, '');
-        $(this).val(number_format(val, false));
-    });
+    // Cache global variables
+    window.BASE_URL = App.utils.getMeta('base-url');
+    window.asset_url = App.utils.getMeta('asset-url');
+    window.ROLE_NAME = App.utils.getMeta('role-name');
+    window.ACTIVE_SLUG = App.utils.getMeta('active-slug');
+});
 
-
-    $('.decimal-only').inputFilter(function (value) {
-        return /^\d*\.?\d*$/.test(value);
-    });
-
-    $('.number-only').inputFilter(function (value) {
-        return /^\d*$/.test(value);
-    });
-
-    $('.max-16').on('input', function () {
-        if ($(this).val().length > 16) {
-            $(this).val($(this).val().slice(0, 16)); // Limit to 16 digits
-        }
-    });
-
-    $('.year-only').datepicker({
-        format: "yyyy",
-        viewMode: "years",
-        minViewMode: "years",
-        autoclose: true,
-    })
-
-    $('.datepicker').datepicker(options.date)
-})
-
-window.BASE_URL = getMeta('base-url');
-window.asset_url = getMeta('asset-url');
-window.ROLE_NAME = getMeta('role-name');
+// const current_route = getMeta('current_url');
+$.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+});

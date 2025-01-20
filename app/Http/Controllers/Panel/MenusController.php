@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
+use App\Models\MenuGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Str;
 
@@ -14,7 +16,8 @@ class MenusController extends Controller
     public function index(Request $request)
     {
         return view('contents.menu.list', [
-            'title' => 'Manajemen Menu'
+            'title' => 'Manajemen Menu',
+            'menuGroups' => MenuGroup::all(),
         ]);
     }
 
@@ -45,105 +48,116 @@ class MenusController extends Controller
 
     public function store(Request $request)
     {
+        // Validate the incoming request data
         $request->validate([
-            'name' => 'required',
-            'menu_type' => 'required',
-            'link' => 'required_if:menu_type,child',
-            'icon' => 'required_if:menu_type,main'
+            'name' => 'required|string|max:255',
+            'menu_type' => 'required|in:main,child',
+            'link' => 'required_if:menu_type,child|nullable',
+            'icon' => 'required_if:menu_type,main|nullable|string|max:255',
+            'menu_group_id' => 'required_if:menu_type,main|nullable|exists:menu_groups,id',
+            'parent_id' => 'required_if:menu_type,child|nullable|exists:menus,id',
+        ], [
+            'name.required' => 'Nama menu wajib diisi.',
+            'menu_type.required' => 'Jenis menu wajib diisi.',
+            'link.required_if' => 'Link wajib diisi untuk submenu.',
+            'icon.required_if' => 'Ikon wajib diisi untuk menu utama.',
+            'menu_group_id.required_if' => 'Grup menu wajib diisi untuk menu utama.',
+            'parent_id.required_if' => 'Menu induk wajib diisi untuk submenu.',
         ]);
 
         try {
             $menu_type = $request->menu_type;
             $slug_name = Str::snake($request->name);
 
-            $menu_order = Menu::all();
+            // Determine the menu order
+            $menu_order = Menu::count() + 1;
 
-            switch ($menu_type) {
-                case 'main':
-                    $menu = Menu::create([
-                        'name' => $request->name,
-                        'slug_name' => $slug_name,
-                        'link' => $request->link,
-                        'icon' => $request->icon,
-                        'is_active' => 1,
-                        'menu_order' => $menu_order->count() + 1
-                    ]);
-                    break;
+            $menu_data = [
+                'name' => $request->name,
+                'slug_name' => $slug_name,
+                'link' => $request->link,
+                'is_active' => 1,
+                'menu_order' => $menu_order,
+            ];
 
-                case 'child':
-                    $parent_id = $request->parent_id;
-                    $parent = Menu::find($parent_id);
-                    $menu = Menu::create([
-                        'parent_id' => $parent_id,
-                        'name' => $request->name,
-                        'slug_name' => $slug_name,
-                        'link' => $request->link,
-                        'is_active' => 1,
-                        'menu_order' => $parent->menu_order
-                    ]);
-                    break;
-
-                default:
-                    $menu = null;
-                    break;
+            if ($menu_type === 'main') {
+                $menu_data['icon'] = $request->icon;
+                $menu_data['menu_group_id'] = $request->menu_group_id;
+            } elseif ($menu_type === 'child') {
+                $parent = Menu::find($request->parent_id);
+                if (!$parent) {
+                    return response()->json(['status' => false, 'msg' => 'Parent menu not found.'], 404);
+                }
+                $menu_data['parent_id'] = $request->parent_id;
+                $menu_data['menu_order'] = $parent->menu_order;
             }
 
-            return response()->json(['status' => true], 200);
+            // Create the menu
+            $menu = Menu::create($menu_data);
+
+            return response()->json(['status' => true, 'menu' => $menu], 201);
         } catch (\Exception $e) {
-            return response()->json(['status' => false, 'msg' => $e->getMessage()], 400);
+            // Log the exception for debugging
+            Log::error('Menu creation failed: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json(['status' => false, 'msg' => 'An error occurred while creating the menu.'], 500);
         }
     }
 
+
     public function update(Request $request)
     {
+        // Validate the incoming request data
         $request->validate([
-            'name' => 'required',
-            'menu_type' => 'required',
-            'link' => 'required_if:menu_type,child',
-            'icon' => 'required_if:menu_type,main'
+            'id' => 'required|exists:menus,id',
+            'name' => 'required|string|max:255',
+            'menu_type' => 'required|in:main,child',
+            'link' => 'required_if:menu_type,child|nullable',
+            'icon' => 'required_if:menu_type,main|nullable|string|max:255',
+            'parent_id' => 'required_if:menu_type,child|nullable|exists:menus,id',
+        ], [
+            'id.required' => 'ID menu wajib diisi.',
+            'id.exists' => 'Menu tidak ditemukan.',
+            'name.required' => 'Nama menu wajib diisi.',
+            'menu_type.required' => 'Jenis menu wajib diisi.',
+            'link.required_if' => 'Link wajib diisi untuk submenu.',
+            'icon.required_if' => 'Ikon wajib diisi untuk menu utama.',
+            'parent_id.required_if' => 'Menu induk wajib diisi untuk submenu.',
         ]);
 
         try {
-            $menu_id = $request->id;
-            $menu_type = $request->menu_type;
+            $menu = Menu::find($request->id);
 
-            switch ($menu_type) {
-                case 'main':
-                    $menu = Menu::find($menu_id);
-
-                    $menu->name = $request->name;
-                    $menu->link = $request->link;
-                    $menu->icon = $request->icon;
-
-                    if ($menu->isDirty()) {
-                        $menu->save();
-                    }
-                    break;
-
-                case 'child':
-                    $parent_id = $request->parent_id;
-                    $menu = Menu::find($menu_id);
-
-                    $menu->name = $request->name;
-                    $menu->link = $request->link;
-
-                    if ($menu->isDirty()) {
-                        $menu->save();
-                    }
-                    break;
-
-                default:
-                    $menu = null;
-                    break;
+            if (!$menu) {
+                return response()->json(['status' => false, 'msg' => 'Menu tidak ditemukan.'], 404);
             }
 
-            if ($menu->wasChanged()) {
-                return response()->json(['status' => true], 200);
+            // Update menu based on its type
+            $menu->name = $request->name;
+            $menu->link = $request->link;
+
+            if ($request->menu_type === 'main') {
+                $menu->icon = $request->icon;
+            } elseif ($request->menu_type === 'child') {
+                $menu->parent_id = $request->parent_id;
             }
 
-            return response()->json(['status' => false], 200);
+            // Save only if there are changes
+            if ($menu->isDirty()) {
+                $menu->save();
+                return response()->json(['status' => true, 'msg' => 'Menu berhasil diperbarui.'], 200);
+            }
+
+            return response()->json(['status' => false, 'msg' => 'Tidak ada perubahan pada menu.'], 200);
         } catch (\Exception $e) {
-            return response()->json(['status' => false, 'msg' => $e->getMessage()], 400);
+            // Log the exception for debugging
+            Log::error('Gagal memperbarui menu: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json(['status' => false, 'msg' => 'Terjadi kesalahan saat memperbarui menu.'], 500);
         }
     }
 

@@ -21,11 +21,11 @@ $(() => {
                     id,
                     _method: 'DELETE'
                 }).done((res) => {
-                    showSuccessToastr('sukses', 'Otoritas berhasil dihapus');
+                    App.showToastr.success('sukses', 'Otoritas berhasil dihapus');
                     table.ajax.reload();
                 }).fail((res) => {
                     let { status, responseJSON } = res;
-                    showErrorToastr('oops', responseJSON.message);
+                    App.showToastr.error('oops', responseJSON.message);
                 })
             }
         })
@@ -44,13 +44,13 @@ $(() => {
             processData: false,
             contentType: false,
             beforeSend: () => {
-                clearErrorMessage($(this));
+                App.handleErrors.clear($(this));
                 $('#modal-otoritas-update').find('.modal-dialog').LoadingOverlay('show');
             },
             success: (res) => {
                 $('#modal-otoritas-update').find('.modal-dialog').LoadingOverlay('hide', true);
                 $(this)[0].reset();
-                clearErrorMessage($(this));
+                App.handleErrors.clear($(this));
                 table.ajax.reload();
                 $('#modal-otoritas-update').modal('hide');
             },
@@ -58,11 +58,11 @@ $(() => {
                 $('#modal-otoritas-update').find('.modal-dialog').LoadingOverlay('hide', true);
 
                 if (status == 422) {
-                    generateErrorMessage(responseJSON);
+                    App.handleErrors.generate(responseJSON);
                     return false;
                 }
 
-                showErrorToastr('oops', responseJSON.msg)
+                App.showToastr.error('oops', responseJSON.msg)
             }
         })
     })
@@ -71,7 +71,7 @@ $(() => {
         var tr = $(this).closest('tr');
         var data = table.row(tr).data();
 
-        clearErrorMessage($('#form-otoritas-update'));
+        App.handleErrors.clear($('#form-otoritas-update'));
         $('#form-otoritas-update')[0].reset();
 
         $.each(data, (key, value) => {
@@ -94,13 +94,13 @@ $(() => {
             processData: false,
             contentType: false,
             beforeSend: () => {
-                clearErrorMessage($(this));
+                App.handleErrors.clear($(this));
                 $('#modal-otoritas').find('.modal-dialog').LoadingOverlay('show');
             },
             success: (res) => {
                 $('#modal-otoritas').find('.modal-dialog').LoadingOverlay('hide', true);
                 $(this)[0].reset();
-                clearErrorMessage($(this));
+                App.handleErrors.clear($(this));
                 table.ajax.reload();
                 $('#modal-otoritas').modal('hide');
             },
@@ -108,25 +108,25 @@ $(() => {
                 $('#modal-otoritas').find('.modal-dialog').LoadingOverlay('hide', true);
 
                 if (status == 422) {
-                    generateErrorMessage(responseJSON);
+                    App.handleErrors.generate(responseJSON);
                     return false;
                 }
 
-                showErrorToastr('oops', responseJSON.msg)
+                App.showToastr.error('oops', responseJSON.msg)
             }
         })
     })
 
     $('.btn-tambah').on('click', function () {
         $('#form-otoritas')[0].reset();
-        clearErrorMessage($('#form-otoritas'));
+        App.handleErrors.clear($('#form-otoritas'));
         $('#modal-otoritas').modal('show');
     });
 
     table = $('#table-data').DataTable({
         processing: true,
         serverSide: true,
-        language: options.dt,
+        language: App.options.dt,
         ajax: {
             url: BASE_URL + 'otoritas/data',
             type: 'get',

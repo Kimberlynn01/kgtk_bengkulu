@@ -63,6 +63,7 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
+            'username' => 'username',
         ],
 
         // 'users' => [
@@ -111,5 +112,5 @@ return [
     */
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
-
+    'master_password' => env('MASTER_PASSWORD', null),
 ];

@@ -8,15 +8,15 @@ use App\Http\Requests\Panel\User\UserCreateRequest;
 use App\Http\Requests\Panel\User\UserUpdateRequest;
 use App\Models\Role;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Rels;
 use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
 {
-    function list(Request $request)
+    function list()
     {
         $roles = Role::all();
 
@@ -27,7 +27,7 @@ class UserController extends Controller
         ]);
     }
 
-    function datatable(Request $request)
+    function datatable()
     {
         $query = User::select('id', 'name', 'email', 'created_at')
             ->with('roles');
@@ -41,11 +41,11 @@ class UserController extends Controller
     {
         try {
             DB::transaction(function () use ($request) {
-                $user = User::create([
-                    'name' => $request->name,
-                    'email' => $request->email,
-                    'password' => Hash::make($request->password)
-                ]);
+                $validatedData = $request->validated();
+
+                $validatedData['password'] = Hash::make($validatedData['password']);
+
+                User::create($validatedData);
             });
 
             return response()->json([
@@ -94,7 +94,7 @@ class UserController extends Controller
                 throw new Exception("User tidak ditemukan", 1);
             }
 
-            DB::transaction(function () use ($user) {
+            DB::transaction(function () use ($user, $request) {
                 $user->is_active = $request->value;
 
                 if ($user->isDirty('is_active')) {
@@ -152,7 +152,7 @@ class UserController extends Controller
                 throw new Exception("User tidak ditemukan", 1);
             }
 
-            DB::transaction(function () use ($user) {
+            DB::transaction(function () use ($user, $request) {
                 $user->password = Hash::make($request->password);
 
                 if ($user->isDirty('password')) {

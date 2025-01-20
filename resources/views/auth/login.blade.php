@@ -10,10 +10,10 @@
         <div class="alert alert-danger">{{ session('message') }}</div>
         @endif
         <div class="form-group">
-            <label for="email">{{__('Email')}}</label>
-            <input type="text" class="form-control @error('email') is-invalid @enderror" id="email" name="email"
-                value="{{ old('email') }}" placeholder="Masukkan email" autofocus>
-            @error('email')
+            <label for="text">{{__('Username')}}</label>
+            <input type="text" class="form-control @error('username') is-invalid @enderror" id="username"
+                name="username" value="{{ old('username') }}" placeholder="Masukkan username" autofocus>
+            @error('username')
             <span class="invalid-feedback" role="alert">
                 <strong>{{ $message }}</strong>
             </span>

@@ -17,7 +17,7 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        $arr = ['Super Admin', 'GTK', 'Dinas', 'BGP', 'LPTK', 'Guru'];
+        $arr = ['Super Admin', 'User'];
 
         $allMenus = Menu::all()->pluck('id');
         $homeMenu = Menu::where('name', '=', 'Beranda')->first();

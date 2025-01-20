@@ -33,6 +33,7 @@ class RbacCheck
             $permissions[$action->name] = $this->rbacCheck($slug, $action->id);
         }
         View::share('permissions', $permissions);
+        View::share('activeSlug', $slug);
 
         $roles = Role::all();
         $role_id = session('role_id');

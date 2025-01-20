@@ -3,8 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use DB;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -15,22 +13,19 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('users')->truncate();
+        User::truncate();
 
         $user = User::create([
             'name' => 'Super Admin',
+            'username' => 'main_admin',
             'email' => 'administrator@app.com',
             'password' => Hash::make('eskelapa')
         ]);
 
-        $user->roles()->attach([1, 2, 3, 4, 5, 6]);
+        $user->roles()->attach([1, 2]);
 
         $userType = [
-            2 => 'GTK',
-            3 => 'Dinas',
-            4 => 'BGP',
-            5 => 'LPTK',
-            6 => 'Guru'
+            2 => 'User',
         ];
 
         foreach ($userType as $key => $newUser) {
@@ -38,6 +33,7 @@ class UserSeeder extends Seeder
 
             $user = User::create([
                 'name' => $newUser,
+                'username' => strtolower($newUser),
                 'email' => strtolower($newUser) . '@app.com',
                 'password' => Hash::make('eskelapa'),
             ]);

@@ -13,7 +13,7 @@
         "laravel/tinker": "^2.9",
         "mpdf/mpdf": "^6.1",
         "mpdf/qrcode": "^1.2",
-        "opcodesio/log-viewer": "^3.11",
+        "opcodesio/log-viewer": "^3.14",
         "owen-it/laravel-auditing": "^13.6",
         "phpoffice/phpspreadsheet": "^2.2",
         "ramsey/uuid": "^4.7",

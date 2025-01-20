@@ -17,14 +17,14 @@ $(() => {
             },
             success: (res) => {
                 $('#modal-update-role').find('.modal-dialog').LoadingOverlay('hide', true);
-                showSuccessToastr('sukses', 'Data peran berhasil diperbarui');
+                App.showToastr.success('sukses', 'Data peran berhasil diperbarui');
                 table.ajax.reload();
                 $('#modal-update-role').modal('hide');
             },
             error: ({ status, responseJSON }) => {
                 $('#modal-update-role').find('.modal-dialog').LoadingOverlay('hide', true);
 
-                return showErrorToastr('oops', responseJSON.msg);
+                return App.showToastr.error('oops', responseJSON.msg);
             }
         })
     })
@@ -65,11 +65,11 @@ $(() => {
                     id,
                     _method: 'PATCH'
                 }).done((res) => {
-                    showSuccessToastr('sukses', 'Kata sandi pengguna berhasil direset');
+                    App.showToastr.success('sukses', 'Kata sandi pengguna berhasil direset');
                     table.ajax.reload();
                 }).fail((res) => {
                     let { status, responseJSON } = res;
-                    showErrorToastr('oops', responseJSON.message);
+                    App.showToastr.error('oops', responseJSON.message);
                 })
             }
         })
@@ -96,11 +96,11 @@ $(() => {
                     id,
                     _method: 'DELETE'
                 }).done((res) => {
-                    showSuccessToastr('sukses', 'Pengguna berhasil dihapus');
+                    App.showToastr.success('sukses', 'Pengguna berhasil dihapus');
                     table.ajax.reload();
                 }).fail((res) => {
                     let { status, responseJSON } = res;
-                    showErrorToastr('oops', responseJSON.message);
+                    App.showToastr.error('oops', responseJSON.message);
                 })
             }
         })
@@ -115,11 +115,11 @@ $(() => {
             value,
             _method: 'PATCH'
         }).done((res) => {
-            showSuccessToastr('sukses', value == '1' ? 'User berhasil diaktifkan' : 'User berhasil dinonaktifkan');
+            App.showToastr.success('sukses', value == '1' ? 'User berhasil diaktifkan' : 'User berhasil dinonaktifkan');
             table.ajax.reload();
         }).fail((res) => {
             let { status, responseJSON } = res;
-            showErrorToastr('oops', responseJSON.message);
+            App.showToastr.error('oops', responseJSON.message);
             console.log(res);
         })
     })
@@ -137,13 +137,13 @@ $(() => {
             processData: false,
             contentType: false,
             beforeSend: () => {
-                clearErrorMessage($('#form-pengguna-update'));
+                App.handleErrors.clear($('#form-pengguna-update'));
                 $('#modal-pengguna-update').find('.modal-dialog').LoadingOverlay('show');
             },
             success: (res) => {
                 $('#modal-pengguna-update').find('.modal-dialog').LoadingOverlay('hide', true);
                 $(this)[0].reset();
-                clearErrorMessage($('#form-pengguna-update'));
+                App.handleErrors.clear($('#form-pengguna-update'));
                 table.ajax.reload();
                 $('#modal-pengguna-update').modal('hide');
             },
@@ -151,11 +151,11 @@ $(() => {
                 $('#modal-pengguna-update').find('.modal-dialog').LoadingOverlay('hide', true);
 
                 if (status == 422) {
-                    generateErrorMessage(responseJSON, true);
+                    App.handleErrors.generate(responseJSON, true);
                     return false;
                 }
 
-                showErrorToastr('oops', responseJSON.msg)
+                App.showToastr.error('oops', responseJSON.msg)
             }
         })
     })
@@ -164,7 +164,7 @@ $(() => {
         var tr = $(this).closest('tr');
         var data = table.row(tr).data();
 
-        clearErrorMessage($('#form-pengguna-update'));
+        App.handleErrors.clear($('#form-pengguna-update'));
         $('#form-pengguna-update')[0].reset();
 
         $.each(data, (key, value) => {
@@ -187,13 +187,13 @@ $(() => {
             processData: false,
             contentType: false,
             beforeSend: () => {
-                clearErrorMessage($('#form-pengguna'));
+                App.handleErrors.clear($('#form-pengguna'));
                 $('#modal-pengguna').find('.modal-dialog').LoadingOverlay('show');
             },
             success: (res) => {
                 $('#modal-pengguna').find('.modal-dialog').LoadingOverlay('hide', true);
                 $(this)[0].reset();
-                clearErrorMessage($('#form-pengguna'));
+                App.handleErrors.clear($('#form-pengguna'));
                 table.ajax.reload();
                 $('#modal-pengguna').modal('hide');
             },
@@ -201,23 +201,23 @@ $(() => {
                 $('#modal-pengguna').find('.modal-dialog').LoadingOverlay('hide', true);
 
                 if (status == 422) {
-                    generateErrorMessage(responseJSON);
+                    App.handleErrors.generate(responseJSON);
                     return false;
                 }
 
-                showErrorToastr('oops', responseJSON.msg)
+                App.showToastr.error('oops', responseJSON.msg)
             }
         })
     })
 
     $('.btn-tambah').on('click', function () {
         $('#form-pengguna')[0].reset();
-        clearErrorMessage($('#form-pengguna'));
+        App.handleErrors.clear($('#form-pengguna'));
         $('#modal-pengguna').modal('show');
     });
 
     table = $('#table-data').DataTable({
-        language: options.dt,
+        language: App.options.dt,
         serverSide: true,
         processing: true,
         ajax: {
