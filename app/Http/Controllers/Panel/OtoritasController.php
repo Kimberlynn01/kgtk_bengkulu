@@ -186,12 +186,10 @@ class OtoritasController extends Controller
 
     public function getMenu($role_id, $parent_id = null)
     {
-        $schema = config('database.connections.sqlsrv.schema');
-
         $menus = Menu::select(DB::raw('id, parent_id, name'))
             ->where('parent_id', $parent_id)
-            ->with(['permissions' => function ($query) use ($role_id, $schema) {
-                $query->select(DB::raw('menu_id, role_id, STUFF((SELECT \',\'+ CONVERT(VARCHAR, action_id) FROM ' . $schema . '.menu_role b WHERE menu_role.menu_id = b.menu_id AND ' . $schema . '.menu_role.role_id = b.role_id GROUP BY action_id  FOR XML PATH (\'\'), TYPE).value(\'.\', \'VARCHAR(MAX)\'),1,1, \'\') as action'));
+            ->with(['permissions' => function ($query) use ($role_id) {
+                $query->select(DB::raw('menu_id, role_id, GROUP_CONCAT(action_id) as action'));
                 $query->where('role_id', $role_id);
                 $query->groupBy('menu_id');
                 $query->groupBy('role_id');
