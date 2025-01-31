@@ -14,6 +14,14 @@
             }
         });
     };
+
+    $.fn.maxInput = function (maxLength) {
+        return this.on("input keydown keyup mousedown select contextmenu drop", function () {
+            if (this.value.length > maxLength) {
+                this.value = this.value.slice(0, maxLength);
+            }
+        });
+    };
 })(jQuery);
 
 const App = {
@@ -32,7 +40,7 @@ const App = {
             infoFiltered: '(Tersaring dari _MAX_ data)',
             emptyTable: 'Data kosong',
         },
-        date: { format: 'yyyy-mm-dd', todayHighlight: true, autoclose: true },
+        date: { language: 'id', position: 'top left' },
         year: { format: "yyyy", viewMode: "years", minViewMode: "years" },
         sampleImage: 'WHlHZUsxZ0VpdGNlNm5kamx4WTdUc3h4YTdHQjFheGFyVU5BTzVOd2VEWXZmTWF1WkJuMnpkZDdFbWtyN0VCN1o0WWFDNjJEcU1IWjZndkEwTFBTREE9PQ==',
     },
@@ -95,7 +103,7 @@ const App = {
         return Swal.fire({ ...types[type || 'default'], html: message, footer, willClose: callback });
     },
 
-    swalConfirmation: ({ title, question: html, footer, callback, icon = 'warning', flipButtonColor = true }) => {
+    swalConfirmation: ({ title = 'Anda Yakin?', question: html, footer, callback, icon = 'warning', flipButtonColor = true }) => {
         let buttonColor = flipButtonColor ? {
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
@@ -154,9 +162,7 @@ $(() => {
 
     $('.decimal-only').inputFilter((value) => /^\d*\.?\d*$/.test(value));
     $('.number-only').inputFilter((value) => /^\d*$/.test(value));
-    $('.max-16').on('input', function () {
-        if (this.value.length > 16) this.value = this.value.slice(0, 16);
-    });
+    $('.max-16').maxInput(16);
 
     // Datepickers
     $('.year-only').datepicker(App.options.year);
