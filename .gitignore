@@ -20,5 +20,4 @@ yarn-error.log
 /.vscode
 /.zed
 
-/public/assets/
 config/audit.php
