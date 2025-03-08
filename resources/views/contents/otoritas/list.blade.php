@@ -71,7 +71,7 @@ $plugins = ['datatable'];
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary waves-effect waves-light">Simpan</button>
                 </div>
             </div><!-- /.modal-content -->
@@ -100,7 +100,7 @@ $plugins = ['datatable'];
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary waves-effect waves-light">Simpan</button>
                 </div>
             </div><!-- /.modal-content -->

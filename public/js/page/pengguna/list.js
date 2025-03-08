@@ -252,7 +252,7 @@ $(() => {
             render: (data, type, row) => {
                 return `
                      <div class="checkbox">
-                            <input type="checkbox"  id="aktif-${row.id}" data-id="${row.id}" ${data == '1' ? 'checked' : ''} value="${data == '1' ? 0 : 1}">
+                            <input type="checkbox" class="switch-active"  id="aktif-${row.id}" data-id="${row.id}" ${data == '1' ? 'checked' : ''} value="${data == '1' ? 0 : 1}">
                             <label for="aktif-${row.id}">${data == '1' ? 'Aktif' : 'Nonaktif'}</label>
                           </div>
                 `;

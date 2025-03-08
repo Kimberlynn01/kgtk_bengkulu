@@ -29,12 +29,12 @@
     <section>
         <div class="container-fluid">
             <div class="row">
-                <div class="col-xl-7">
+                {{-- <div class="col-xl-7">
                     <img class="bg-img-cover bg-center" src="{{asset('assets')}}/images/login/2.jpg" alt="looginpage">
-                </div>
-                <div class="col-xl-5 p-0">
+                </div> --}}
+                {{-- <div class="col-xl-5 p-0"> --}}
                     @yield('contents', '')
-                </div>
+                {{-- </div> --}}
             </div>
         </div>
     </section>

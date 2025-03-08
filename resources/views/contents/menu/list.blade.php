@@ -53,7 +53,7 @@ $plugins = ['datatable', 'swal'];
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title mt-0" id="modal-menuLabel">Form Menu</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -129,7 +129,7 @@ $plugins = ['datatable', 'swal'];
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary waves-effect waves-light">Simpan</button>
                 </div>
             </div>
@@ -147,7 +147,7 @@ $plugins = ['datatable', 'swal'];
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title mt-0" id="modal-update-menuLabel">Form Menu</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -224,7 +224,7 @@ $plugins = ['datatable', 'swal'];
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-secondary waves-effect" data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary waves-effect waves-light">Simpan</button>
                 </div>
             </div>

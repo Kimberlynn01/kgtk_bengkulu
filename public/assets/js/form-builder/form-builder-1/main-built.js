@@ -5200,7 +5200,7 @@ if (!jQuery) throw new Error("Bootstrap requires jQuery"); + function(e) {
             });
         this.$element.trigger(r);
         if (this.isShown || r.isDefaultPrevented()) return;
-        this.isShown = !0, this.escape(), this.$element.on("click.dismiss.modal", '[data-dismiss="modal"]', e.proxy(this.hide, this)), this.backdrop(function() {
+        this.isShown = !0, this.escape(), this.$element.on("click.dismiss.modal", '[data-bs-dismiss="modal"]', e.proxy(this.hide, this)), this.backdrop(function() {
             var r = e.support.transition && n.$element.hasClass("fade");
             n.$element.parent().length || n.$element.appendTo(document.body), n.$element.show(), r && n.$element[0].offsetWidth, n.$element.addClass("in").attr("aria-hidden", !1), n.enforceFocus();
             var i = e.Event("shown.bs.modal", {

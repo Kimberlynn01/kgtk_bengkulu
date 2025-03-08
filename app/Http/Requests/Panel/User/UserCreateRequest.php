@@ -27,6 +27,7 @@ class UserCreateRequest extends FormRequest
 
         return [
             'name' => 'required',
+            'username' => 'required',
             'email' => [
                 'required',
                 // Rule::unique("$schema.users", 'email'),

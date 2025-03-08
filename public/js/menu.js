@@ -42,12 +42,28 @@ const generate = (data) => {
     for (const group of data) {
         let { name, menus } = group;
 
-        container.append(` <li class="sidebar-main-title">
+        // Simpan jumlah item sebelum menambahkan menu
+        let initialCount = container.children().length;
+
+        // Tambahkan sidebar title sementara
+        let sidebarTitle = $(`<li class="sidebar-main-title">
                                     <div>
-                                        <h6>${name} </h6>
+                                        <h6>${name}</h6>
                                     </div>
-                                </li>`);
+                                  </li>`);
+        container.append(sidebarTitle);
+
+        // Generate menu
         generateMenu(menus, container);
+
+        // Cek apakah ada <li class="dropdown"> yang ditambahkan
+        let newItems = container.children().slice(initialCount);
+        let hasDropdown = newItems.filter((_, el) => $(el).hasClass("dropdown")).length > 0;
+
+        // Jika tidak ada dropdown, hapus sidebar title
+        if (!hasDropdown) {
+            sidebarTitle.remove();
+        }
     }
 
     $(".toggle-nav").click(function () {

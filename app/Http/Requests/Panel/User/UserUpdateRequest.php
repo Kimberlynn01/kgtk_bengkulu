@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Panel\User;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class UserUpdateRequest extends FormRequest
 {
@@ -19,7 +21,7 @@ class UserUpdateRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules(Request $request): array
     {
         $schema = config('database.connections.sqlsrv.schema');
 
@@ -27,8 +29,8 @@ class UserUpdateRequest extends FormRequest
             'name' => 'required',
             'username' => [
                 'required',
-                Rule::unique("$schema.users", 'username')
-                    ->ignore($request->id)
+                // Rule::unique("$schema.users", 'username')
+                //     ->ignore($request->id)
             ]
         ];
     }

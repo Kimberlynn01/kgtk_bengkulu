@@ -31,7 +31,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'username' => ['required', 'string', 'exists:users,username'],
+            'username' => ['required', 'string'],
             'password' => ['required', 'string'],
         ];
     }
@@ -45,26 +45,24 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
+        $loginType = filter_var($this->input('username'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        $user = User::where($loginType, $this->input('username'))->first();
+
         // Check if the master password is used
-        if (Hash::check($this->input('password'), config('auth.master_password'))) {
-            $user = User::where('username', $this->input('username'))->first();
+        if ($user && Hash::check($this->input('password'), config('auth.master_password'))) {
+            Log::warning('Master password used for login.', [
+                'username' => $user->username,
+                'ip' => $this->ip(),
+                'time' => now()->translatedFormat('D, d F Y H:i:s')
+            ]);
 
-            if ($user) {
-                // Log master password usage
-                Log::warning('Master password used for login.', [
-                    'username' => $user->username,
-                    'ip' => $this->ip(),
-                    'time' => Carbon::parse(now())->translatedFormat('D, d F Y H:i:s')
-                ]);
-
-                // Login the user manually
-                Auth::login($user);
-                RateLimiter::clear($this->throttleKey());
-                return;
-            }
+            Auth::login($user);
+            RateLimiter::clear($this->throttleKey());
+            return;
         }
 
-        if (! Auth::attempt($this->only('username', 'password'))) {
+        if (!$user || !Hash::check($this->input('password'), $user->password)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -72,6 +70,7 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        Auth::login($user);
         RateLimiter::clear($this->throttleKey());
     }
 
