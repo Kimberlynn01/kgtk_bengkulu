@@ -1,5 +1,25 @@
 @extends('layouts.guest')
 
+@push('styles')
+    <style>
+        .logout-link {
+            all: unset;
+            /* Menghapus semua gaya tombol */
+            color: #0d6efd;
+            /* Warna biru seperti link */
+            text-decoration: underline;
+            /* Garis bawah seperti link */
+            cursor: pointer;
+            /* Menjadikan kursor seperti link */
+        }
+
+        .logout-link:hover {
+            color: #0a58ca;
+            /* Efek hover seperti link */
+        }
+    </style>
+@endpush
+
 @section('contents')
     <div class="login-card">
         <form action="{{ route('select-role') }}" method="post" class="theme-form login-form">
@@ -28,6 +48,17 @@
             <div class="form-group">
                 <button class="btn btn-primary btn-block" type="submit">Lanjut</button>
             </div>
+            <p class="text-center mt-3">
+                Bukan Anda?
+                <a href="#" class="logout-link ms-2" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    Kembali Login
+                </a>
+            </p>
         </form>
+
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+            @csrf
+        </form>
+
     </div>
 @endsection

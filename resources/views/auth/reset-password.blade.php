@@ -1,7 +1,7 @@
 @extends('layouts.guest')
 
 @section('contents')
-    <div class="login-card shadow-lg p-4 rounded bg-white" style="width: 400px;">
+    <div class="login-card">
         <form class="theme-form login-form" action="{{ route('password.store') }}" method="POST">
             @csrf
             <h4 class="text-center">Reset Password</h4>

@@ -1,7 +1,7 @@
 @extends('layouts.guest')
 
 @section('contents')
-    <div class="login-card shadow-lg p-4 rounded bg-white" style="width: 400px;">
+    <div class="login-card">
         <form class="theme-form login-form" action="{{ route('login') }}" method="post">
             @csrf
             <h4 class="text-center">Masuk</h4>
@@ -9,6 +9,12 @@
 
             @if (session('status'))
                 <div class="alert alert-success">{{ session('status') }}</div>
+            @endif
+
+            @if (session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
             @endif
 
             @if (session('message'))
@@ -33,7 +39,7 @@
                     <input type="password" class="form-control @error('password') is-invalid @enderror" id="password"
                         name="password" placeholder="Masukkan Kata Sandi">
                     <div class="input-group-append">
-                        <button type="button" class="btn btn-outline-secondary" id="showPassword">
+                        <button type="button" class="btn btn-outline-primary" id="showPassword">
                             <i class="icofont icofont-eye-alt"></i>
                         </button>
                     </div>
@@ -67,7 +73,7 @@
                     </span>
                 </a>
             </div>
-            <p>Belum memiliki akun?<a class="ms-2" href="log-in.html">Buat Akun</a></p>
+            <p>Belum memiliki akun?<a class="ms-2" href="{{ route('register') }}">Buat Akun</a></p>
         </form>
     </div>
 
