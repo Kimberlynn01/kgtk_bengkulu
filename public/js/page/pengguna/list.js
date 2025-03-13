@@ -251,10 +251,13 @@ $(() => {
             data: 'is_active',
             render: (data, type, row) => {
                 return `
-                     <div class="checkbox">
-                            <input type="checkbox" class="switch-active"  id="aktif-${row.id}" data-id="${row.id}" ${data == '1' ? 'checked' : ''} value="${data == '1' ? 0 : 1}">
-                            <label for="aktif-${row.id}">${data == '1' ? 'Aktif' : 'Nonaktif'}</label>
-                          </div>
+                    <div class="media-body text-end icon-state d-flex align-items-center justify-content-end gap-2">
+                        <label class="switch m-0">
+                            <input type="checkbox" class="switch-active" id="aktif-${row.id}" data-id="${row.id}" ${data == '1' ? 'checked' : ''} value="${data == '1' ? '0' : '1'}">
+                            <span class="switch-state bg-primary"></span>
+                        </label>
+                        <label for="aktif-${row.id}" class="m-0 text-start">${data == '1' ? 'Aktif' : 'Nonaktif'}</label>
+                    </div>
                 `;
             }
         }, {

@@ -27,7 +27,7 @@ class UserController extends Controller
 
     public function datatable()
     {
-        return DataTables::of(User::select('id', 'name', 'email', 'created_at')->with('roles'))
+        return DataTables::of(User::select('id', 'name', 'email', 'is_active', 'created_at')->with('roles'))
             ->addIndexColumn()
             ->make(true);
     }

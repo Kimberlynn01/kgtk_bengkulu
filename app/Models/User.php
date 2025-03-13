@@ -33,6 +33,7 @@ class User extends Authenticatable implements Auditable
         'name',
         'username',
         'email',
+        'is_active',
         'password',
     ];
 
