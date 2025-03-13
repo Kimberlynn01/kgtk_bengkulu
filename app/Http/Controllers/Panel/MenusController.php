@@ -23,7 +23,7 @@ class MenusController extends Controller
 
     public function data(Request $request)
     {
-        $list = Menu::select(DB::raw('id, parent_id, name, slug_name, icon, link, created_at'))->with('parents');
+        $list = Menu::select(DB::raw('id, parent_id, name, slug_name, icon, link, created_at, menu_group_id'))->with('parents');
 
         return DataTables::of($list)
             ->addIndexColumn()
@@ -116,6 +116,7 @@ class MenusController extends Controller
             'menu_type' => 'required|in:main,child',
             'link' => 'required_if:menu_type,child|nullable',
             'icon' => 'required_if:menu_type,main|nullable|string|max:255',
+            'menu_group_id' => 'required_if:menu_type,main|nullable|exists:menu_groups,id',
             'parent_id' => 'required_if:menu_type,child|nullable|exists:menus,id',
         ], [
             'id.required' => 'ID menu wajib diisi.',
@@ -124,6 +125,7 @@ class MenusController extends Controller
             'menu_type.required' => 'Jenis menu wajib diisi.',
             'link.required_if' => 'Link wajib diisi untuk submenu.',
             'icon.required_if' => 'Ikon wajib diisi untuk menu utama.',
+            'menu_group_id.required_if' => 'Grup menu wajib diisi untuk menu utama.',
             'parent_id.required_if' => 'Menu induk wajib diisi untuk submenu.',
         ]);
 
@@ -140,6 +142,7 @@ class MenusController extends Controller
 
             if ($request->menu_type === 'main') {
                 $menu->icon = $request->icon;
+                $menu->menu_group_id = $request->menu_group_id;
             } elseif ($request->menu_type === 'child') {
                 $menu->parent_id = $request->parent_id;
             }

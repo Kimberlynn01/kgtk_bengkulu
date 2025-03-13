@@ -53,6 +53,7 @@ $(() => {
                 App.handleErrors.clear($(this));
                 table.ajax.reload();
                 $('#modal-update-menu').modal('hide');
+                App.showToastr.success('sukses', 'Menu berhasil disimpan');
             },
             error: ({ status, responseJSON }) => {
                 // $('#modal-update-menu').find('.modal-dialog').LoadingOverlay('hide', true);
@@ -73,7 +74,7 @@ $(() => {
         $('#form-update-menu')[0].reset();
         App.handleErrors.clear($('#form-update-menu'));
 
-        let { id, name, link, menu_type, icon, parent_id } = data;
+        let { id, name, link, menu_type, icon, parent_id, menu_group_id } = data;
 
         $('#update-id').val(id);
         $('#update-name').val(name);
@@ -92,6 +93,7 @@ $(() => {
                 break;
         }
         $('#update-icon').val(icon);
+        $('#update-menu_group_id').val(menu_group_id);
         getMainMenu('#update-parent_id', parent_id);
 
         $('#modal-update-menu').modal('show');
@@ -119,6 +121,7 @@ $(() => {
                 App.handleErrors.clear($(this));
                 table.ajax.reload();
                 $('#modal-menu').modal('hide');
+                App.showToastr.success('sukses', 'Menu berhasil disimpan');
             },
             error: ({ status, responseJSON }) => {
                 // $('#modal-menu').find('.modal-dialog').LoadingOverlay('hide', true);

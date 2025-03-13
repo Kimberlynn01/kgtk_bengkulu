@@ -20,7 +20,7 @@ class Menu extends Model implements Auditable
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $guarded = ['created_at', 'updated_at'];
+    protected $guarded = ['id'];
 
     /**
      * The roles that belong to the Menu
