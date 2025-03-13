@@ -84,13 +84,13 @@
             </div>
 
             <div class="text-center mt-3">
-                <a href=""
+                <a href="{{ route('google.login') }}"
                     class="btn btn-primary w-100 mb-3 d-flex align-items-center justify-content-center position-relative py-2">
                     <div class="bg-white p-2 d-flex rounded position-absolute top-2" style="left: 4px;">
                         <img src="{{ asset('assets/images/google-logo.png') }}" alt="google-logo" width="16">
                     </div>
                     <span class="fw-semibold">
-                        Daftar dengan Google
+                        Lanjutkan dengan Google
                     </span>
                 </a>
             </div>
