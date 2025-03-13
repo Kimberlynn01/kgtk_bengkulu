@@ -285,7 +285,8 @@ const generateMenu = (data, container) => {
                 html: [$('<a>', {
                     id: 'menu-' + slug_name,
                     class: 'nav-link menu-title' + (ACTIVE_SLUG == slug_name ? ' active' : ''),
-                    href: route == null ? 'javascript:void(0)' : BASE_URL + route,
+                    // href: route == null ? 'javascript:void(0)' : BASE_URL + route,
+                    href: 'javascript:void(0)',
                     html: `<i class="${icon}"></i> <span>${name}</span>`
                 }),
                     childData

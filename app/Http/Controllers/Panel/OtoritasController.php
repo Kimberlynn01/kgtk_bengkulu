@@ -73,22 +73,51 @@ class OtoritasController extends Controller
     public function submitPermission(Request $request)
     {
         try {
-            DB::transaction(function () use ($request) {
-                MenuRole::where('role_id', $request->role_id)->delete();
-                $permissions = collect($request->except('_token', 'role_id'))
-                    ->keys()
-                    ->map(function ($key) {
-                        [$menu_id,, $action_id] = explode('_', $key);
-                        return ['menu_id' => $menu_id, 'action_id' => $action_id];
-                    });
+            $role_id = $request->role_id;
 
-                Role::findOrFail($request->role_id)->menus()->attach($permissions);
+            $actions = Action::all();
+            $menus = Menu::all();
+            $role = Role::find($role_id);
+
+            DB::transaction(function () use ($role_id, $role, $actions, $menus, $request) {
+                MenuRole::where([
+                    'role_id' => $role_id,
+                ])->delete();
+
+                $menuRoleData = [];
+
+                // Collect the menu-role-action combinations to attach
+                foreach ($menus as $menu) {
+                    $actionIds = [];
+
+                    foreach ($actions as $action) {
+                        $request_name = $menu->id . '_' . $role->id . '_' . $action->id;
+
+                        // If the request contains the specific menu and action, add the action id
+                        if ($request->has($request_name)) {
+                            $actionIds[] = $action->id;
+                        }
+                    }
+
+                    // If there are any actions for this menu, add them to the array
+                    if (!empty($actionIds)) {
+                        foreach ($actionIds as $actionId) {
+                            $menuRoleData[$menu->id][] = ['action_id' => $actionId];
+                        }
+                    }
+                }
+
+                // Sync each menu with its respective actions for the role
+                foreach ($menuRoleData as $menu_id => $actions) {
+                    foreach ($actions as $action) {
+                        $role->menus()->attach($menu_id, $action);
+                    }
+                }
             });
 
-            return redirect()->route('otoritas')->with('affected', 0);
+            return redirect()->route('otoritas')->with('affected', true);
         } catch (\Exception $e) {
-            Log::error($e->getMessage());
-            return redirect()->route('otoritas')->with('error', 'Failed to update permissions.');
+            return redirect()->route('otoritas')->with('error', $e->getMessage());
         }
     }
 
