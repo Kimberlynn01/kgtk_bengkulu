@@ -21,6 +21,7 @@ class RoleSeeder extends Seeder
 
         $allMenus = Menu::all()->pluck('id');
         $homeMenu = Menu::where('name', '=', 'Beranda')->first();
+        $profilMenu = Menu::where('name', '=', 'Profil')->first();
 
         $allActions = Action::all()->pluck('id');
 
@@ -40,8 +41,12 @@ class RoleSeeder extends Seeder
                     }
                 }
             } else {
-                foreach ($allActions as $action) {
-                    $role->menus()->attach($homeMenu->id, ['action_id' => $action]);
+                $allowedMenus = collect([$homeMenu, $profilMenu])->filter();
+
+                foreach ($allowedMenus as $menu) {
+                    foreach ($allActions as $action) {
+                        $role->menus()->attach($menu->id, ['action_id' => $action]);
+                    }
                 }
             }
         }

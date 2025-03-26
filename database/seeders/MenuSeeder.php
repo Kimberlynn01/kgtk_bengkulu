@@ -55,5 +55,15 @@ class MenuSeeder extends Seeder
             'icon' => 'icofont icofont-shield-alt',
             'is_active' => 1,
         ]);
+
+        Menu::create([
+            'name' => 'Profil',
+            'menu_group_id' => 1,
+            'slug_name' => 'profil',
+            'menu_order' => 5,
+            'link' => 'profil',
+            'icon' => 'icofont icofont-ui-user',
+            'is_active' => 1,
+        ]);
     }
 }
