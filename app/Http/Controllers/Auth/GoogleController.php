@@ -39,7 +39,7 @@ class GoogleController extends Controller
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
                     'username' => explode('@', $googleUser->getEmail())[0],
-                    'password' => bcrypt(Str::random(24)),
+                    'password' => Hash::make('eskelapa'),
                     'is_active' => '1',
                 ]);
 
