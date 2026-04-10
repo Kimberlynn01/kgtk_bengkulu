@@ -21,3 +21,6 @@ yarn-error.log
 /.zed
 
 config/audit.php
+
+**/*.DS_Store
+.DS_Store

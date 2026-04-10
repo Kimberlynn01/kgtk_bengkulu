@@ -55,5 +55,10 @@ class AppServiceProvider extends ServiceProvider
         EloquentBuilder::macro('toSqlWithBindings', function () {
             return $this->getQuery()->toSqlWithBindings();
         });
+
+        // Impersonate
+        View::composer('*', function ($view) {
+            $view->with('isImpersonating', session()->has('impersonate_id'));
+        });
     }
 }

@@ -22,6 +22,7 @@ Route::middleware('auth')->group(function () {
     require __DIR__ . '/panel/menu.php';
     require __DIR__ . '/panel/otoritas.php';
     require __DIR__ . '/panel/profil.php';
+    require __DIR__ . '/panel/impersonate.php';
 });
 
 

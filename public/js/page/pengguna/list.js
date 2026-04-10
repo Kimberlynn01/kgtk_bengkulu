@@ -1,317 +1,397 @@
 let table;
 $(() => {
-    $('#form-update-role').on('submit', function (e) {
+    $("#form-update-role").on("submit", function (e) {
         e.preventDefault();
 
         var data = new FormData(this);
 
         $.ajax({
-            url: $(this).attr('action'),
-            type: $(this).attr('method'),
+            url: $(this).attr("action"),
+            type: $(this).attr("method"),
             data: data,
-            dataType: 'json',
+            dataType: "json",
             processData: false,
             contentType: false,
             beforeSend: () => {
-                $('#modal-update-role').find('.modal-dialog').LoadingOverlay('show');
+                $("#modal-update-role")
+                    .find(".modal-dialog")
+                    .LoadingOverlay("show");
             },
             success: (res) => {
-                $('#modal-update-role').find('.modal-dialog').LoadingOverlay('hide', true);
-                App.showToastr.success('sukses', 'Data peran berhasil diperbarui');
+                $("#modal-update-role")
+                    .find(".modal-dialog")
+                    .LoadingOverlay("hide", true);
+                App.showToastr.success(
+                    "sukses",
+                    "Data peran berhasil diperbarui",
+                );
                 table.ajax.reload();
-                $('#modal-update-role').modal('hide');
+                $("#modal-update-role").modal("hide");
             },
             error: ({ status, responseJSON }) => {
-                $('#modal-update-role').find('.modal-dialog').LoadingOverlay('hide', true);
+                $("#modal-update-role")
+                    .find(".modal-dialog")
+                    .LoadingOverlay("hide", true);
 
-                return App.showToastr.error('oops', responseJSON.msg);
-            }
-        })
-    })
+                return App.showToastr.error("oops", responseJSON.msg);
+            },
+        });
+    });
 
-    $('#table-data').on('click', '.btn-update-role', function () {
-        let data = table.row($(this).closest('tr')).data();
+    $("#table-data").on("click", ".btn-update-role", function () {
+        let data = table.row($(this).closest("tr")).data();
 
         let { id, name, roles } = data;
 
-        $('.user-name').text(name);
-        $('#update-role-user-id').val(id);
+        $(".user-name").text(name);
+        $("#update-role-user-id").val(id);
 
-        $('.checkbox-role').prop('checked', false);
+        $(".checkbox-role").prop("checked", false);
         for (const role of roles) {
-            $('#role-' + role.id).prop('checked', true);
+            $("#role-" + role.id).prop("checked", true);
         }
 
-        $('#modal-update-role').modal('show');
-    })
+        $("#modal-update-role").modal("show");
+    });
 
-    $('#table-data').on('click', '.btn-reset-password', function () {
-        let data = table.row($(this).closest('tr')).data();
+    $("#table-data").on("click", ".btn-reset-password", function () {
+        let data = table.row($(this).closest("tr")).data();
 
         let { id, name } = data;
 
         Swal.fire({
-            title: 'Anda yakin?',
+            title: "Anda yakin?",
             html: `Anda akan mereset kata sandi milik "<b>${name}</b>"!`,
-            icon: 'warning',
+            icon: "warning",
             showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, Reset!',
-            cancelButtonText: 'Batal'
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Ya, Reset!",
+            cancelButtonText: "Batal",
         }).then((result) => {
             if (result.isConfirmed) {
-                $.post(BASE_URL + 'users/reset-password', {
+                $.post(BASE_URL + "users/reset-password", {
                     id,
-                    _method: 'PATCH'
-                }).done((res) => {
-                    App.showToastr.success('sukses', 'Kata sandi pengguna berhasil direset');
-                    table.ajax.reload();
-                }).fail((res) => {
-                    let { status, responseJSON } = res;
-                    App.showToastr.error('oops', responseJSON.message);
+                    _method: "PATCH",
                 })
+                    .done((res) => {
+                        App.showToastr.success(
+                            "sukses",
+                            "Kata sandi pengguna berhasil direset",
+                        );
+                        table.ajax.reload();
+                    })
+                    .fail((res) => {
+                        let { status, responseJSON } = res;
+                        App.showToastr.error("oops", responseJSON.message);
+                    });
             }
-        })
-    })
+        });
+    });
 
-    $('#table-data').on('click', '.btn-delete', function () {
-        let data = table.row($(this).closest('tr')).data();
+    $("#table-data").on("click", ".btn-delete", function () {
+        let data = table.row($(this).closest("tr")).data();
 
         let { id, name } = data;
 
         Swal.fire({
-            title: 'Anda yakin?',
+            title: "Anda yakin?",
             html: `Anda akan menghapus pengguna "<b>${name}</b>"!`,
-            footer: 'Data yang sudah dihapus tidak bisa dikembalikan kembali!',
-            icon: 'warning',
+            footer: "Data yang sudah dihapus tidak bisa dikembalikan kembali!",
+            icon: "warning",
             showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, Hapus!',
-            cancelButtonText: 'Batal'
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Ya, Hapus!",
+            cancelButtonText: "Batal",
         }).then((result) => {
             if (result.isConfirmed) {
-                $.post(BASE_URL + 'users/delete', {
+                $.post(BASE_URL + "users/delete", {
                     id,
-                    _method: 'DELETE'
-                }).done((res) => {
-                    App.showToastr.success('sukses', 'Pengguna berhasil dihapus');
-                    table.ajax.reload();
-                }).fail((res) => {
-                    let { status, responseJSON } = res;
-                    App.showToastr.error('oops', responseJSON.message);
+                    _method: "DELETE",
                 })
+                    .done((res) => {
+                        App.showToastr.success(
+                            "sukses",
+                            "Pengguna berhasil dihapus",
+                        );
+                        table.ajax.reload();
+                    })
+                    .fail((res) => {
+                        let { status, responseJSON } = res;
+                        App.showToastr.error("oops", responseJSON.message);
+                    });
             }
-        })
-    })
+        });
+    });
 
-    $('#table-data').on('change', '.switch-active', function () {
-        var id = $(this).data('id');
+    $("#table-data").on("change", ".switch-active", function () {
+        var id = $(this).data("id");
         var value = $(this).val();
 
-        $.post(BASE_URL + 'users/switch', {
+        $.post(BASE_URL + "users/switch", {
             id,
             value,
-            _method: 'PATCH'
-        }).done((res) => {
-            App.showToastr.success('sukses', value == '1' ? 'User berhasil diaktifkan' : 'User berhasil dinonaktifkan');
-            table.ajax.reload();
-        }).fail((res) => {
-            let { status, responseJSON } = res;
-            App.showToastr.error('oops', responseJSON.message);
-            console.log(res);
+            _method: "PATCH",
         })
-    })
+            .done((res) => {
+                App.showToastr.success(
+                    "sukses",
+                    value == "1"
+                        ? "User berhasil diaktifkan"
+                        : "User berhasil dinonaktifkan",
+                );
+                table.ajax.reload();
+            })
+            .fail((res) => {
+                let { status, responseJSON } = res;
+                App.showToastr.error("oops", responseJSON.message);
+                console.log(res);
+            });
+    });
 
-    $('#form-pengguna-update').on('submit', function (e) {
+    $("#form-pengguna-update").on("submit", function (e) {
         e.preventDefault();
 
         var data = new FormData(this);
 
         $.ajax({
-            url: $(this).attr('action'),
-            type: $(this).attr('method'),
+            url: $(this).attr("action"),
+            type: $(this).attr("method"),
             data: data,
-            dataType: 'json',
+            dataType: "json",
             processData: false,
             contentType: false,
             beforeSend: () => {
-                App.handleErrors.clear($('#form-pengguna-update'));
-                $('#modal-pengguna-update').find('.modal-dialog').LoadingOverlay('show');
+                App.handleErrors.clear($("#form-pengguna-update"));
+                $("#modal-pengguna-update")
+                    .find(".modal-dialog")
+                    .LoadingOverlay("show");
             },
             success: (res) => {
-                $('#modal-pengguna-update').find('.modal-dialog').LoadingOverlay('hide', true);
+                $("#modal-pengguna-update")
+                    .find(".modal-dialog")
+                    .LoadingOverlay("hide", true);
                 $(this)[0].reset();
-                App.handleErrors.clear($('#form-pengguna-update'));
+                App.handleErrors.clear($("#form-pengguna-update"));
                 table.ajax.reload();
-                $('#modal-pengguna-update').modal('hide');
+                $("#modal-pengguna-update").modal("hide");
             },
             error: ({ status, responseJSON }) => {
-                $('#modal-pengguna-update').find('.modal-dialog').LoadingOverlay('hide', true);
+                $("#modal-pengguna-update")
+                    .find(".modal-dialog")
+                    .LoadingOverlay("hide", true);
 
                 if (status == 422) {
                     App.handleErrors.generate(responseJSON, true);
                     return false;
                 }
 
-                App.showToastr.error('oops', responseJSON.msg)
-            }
-        })
-    })
+                App.showToastr.error("oops", responseJSON.msg);
+            },
+        });
+    });
 
-    $('#table-data').on('click', '.btn-update', function () {
-        var tr = $(this).closest('tr');
+    $("#table-data").on("click", ".btn-update", function () {
+        var tr = $(this).closest("tr");
         var data = table.row(tr).data();
 
-        App.handleErrors.clear($('#form-pengguna-update'));
-        $('#form-pengguna-update')[0].reset();
+        App.handleErrors.clear($("#form-pengguna-update"));
+        $("#form-pengguna-update")[0].reset();
 
         $.each(data, (key, value) => {
-            $('#update-' + key).val(value);
-        })
+            $("#update-" + key).val(value);
+        });
 
-        $('#modal-pengguna-update').modal('show');
-    })
+        $("#modal-pengguna-update").modal("show");
+    });
 
-    $('#form-pengguna').on('submit', function (e) {
+    $("#form-pengguna").on("submit", function (e) {
         e.preventDefault();
 
         var data = new FormData(this);
 
         $.ajax({
-            url: $(this).attr('action'),
-            type: $(this).attr('method'),
+            url: $(this).attr("action"),
+            type: $(this).attr("method"),
             data: data,
-            dataType: 'json',
+            dataType: "json",
             processData: false,
             contentType: false,
             beforeSend: () => {
-                App.handleErrors.clear($('#form-pengguna'));
-                $('#modal-pengguna').find('.modal-dialog').LoadingOverlay('show');
+                App.handleErrors.clear($("#form-pengguna"));
+                $("#modal-pengguna")
+                    .find(".modal-dialog")
+                    .LoadingOverlay("show");
             },
             success: (res) => {
-                $('#modal-pengguna').find('.modal-dialog').LoadingOverlay('hide', true);
+                $("#modal-pengguna")
+                    .find(".modal-dialog")
+                    .LoadingOverlay("hide", true);
                 $(this)[0].reset();
-                App.handleErrors.clear($('#form-pengguna'));
+                App.handleErrors.clear($("#form-pengguna"));
                 table.ajax.reload();
-                $('#modal-pengguna').modal('hide');
+                $("#modal-pengguna").modal("hide");
             },
             error: ({ status, responseJSON }) => {
-                $('#modal-pengguna').find('.modal-dialog').LoadingOverlay('hide', true);
+                $("#modal-pengguna")
+                    .find(".modal-dialog")
+                    .LoadingOverlay("hide", true);
 
                 if (status == 422) {
                     App.handleErrors.generate(responseJSON);
                     return false;
                 }
 
-                App.showToastr.error('oops', responseJSON.msg)
-            }
-        })
-    })
-
-    $('.btn-tambah').on('click', function () {
-        $('#form-pengguna')[0].reset();
-        App.handleErrors.clear($('#form-pengguna'));
-        $('#modal-pengguna').modal('show');
+                App.showToastr.error("oops", responseJSON.msg);
+            },
+        });
     });
 
-    table = $('#table-data').DataTable({
+    $(".btn-tambah").on("click", function () {
+        $("#form-pengguna")[0].reset();
+        App.handleErrors.clear($("#form-pengguna"));
+        $("#modal-pengguna").modal("show");
+    });
+
+    table = $("#table-data").DataTable({
         language: App.options.dt,
         serverSide: true,
         processing: true,
         ajax: {
-            url: BASE_URL + 'users/data',
-            type: 'get',
-            dataType: 'json'
+            url: BASE_URL + "users/data",
+            type: "get",
+            dataType: "json",
         },
-        order: [[5, 'desc']],
-        columnDefs: [{
-            targets: [0, 4],
-            orderable: false,
-            searchable: false,
-            className: 'text-center align-top'
-        }, {
-            targets: [1, 2],
-            className: 'text-left align-top'
-        }, {
-            targets: [3],
-            className: 'text-center align-top'
-        }, {
-            targets: [5],
-            visible: false,
-        }],
-        columns: [{
-            data: 'DT_RowIndex'
-        }, {
-            data: 'email',
-        }, {
-            data: 'name'
-        }, {
-            data: 'is_active',
-            render: (data, type, row) => {
-                return `
+        order: [[5, "desc"]],
+        columnDefs: [
+            {
+                targets: [0, 4],
+                orderable: false,
+                searchable: false,
+                className: "text-center align-top",
+            },
+            {
+                targets: [1, 2],
+                className: "text-left align-top",
+            },
+            {
+                targets: [3],
+                className: "text-center align-top",
+            },
+            {
+                targets: [5],
+                visible: false,
+            },
+        ],
+        columns: [
+            {
+                data: "DT_RowIndex",
+            },
+            {
+                data: "email",
+            },
+            {
+                data: "name",
+            },
+            {
+                data: "is_active",
+                render: (data, type, row) => {
+                    return `
                     <div class="media-body text-end icon-state d-flex align-items-center justify-content-end gap-2">
                         <label class="switch m-0">
-                            <input type="checkbox" class="switch-active" id="aktif-${row.id}" data-id="${row.id}" ${data == '1' ? 'checked' : ''} value="${data == '1' ? '0' : '1'}">
+                            <input type="checkbox" class="switch-active" id="aktif-${row.id}" data-id="${row.id}" ${data == "1" ? "checked" : ""} value="${data == "1" ? "0" : "1"}">
                             <span class="switch-state bg-primary"></span>
                         </label>
-                        <label for="aktif-${row.id}" class="m-0 text-start">${data == '1' ? 'Aktif' : 'Nonaktif'}</label>
+                        <label for="aktif-${row.id}" class="m-0 text-start">${data == "1" ? "Aktif" : "Nonaktif"}</label>
                     </div>
                 `;
+                },
+            },
+            {
+                data: "id",
+                render: (data, type, row) => {
+                    const button_edit = $("<button>", {
+                        class: "btn btn-primary btn-update",
+                        type: "button",
+                        html: '<i class="icofont icofont-ui-edit"></i>',
+                        "data-id": data,
+                    }).prop("outerHTML");
+
+                    const button_delete = $("<button>", {
+                        class: "btn btn-danger btn-delete",
+                        type: "button",
+                        html: '<i class="icofont icofont-trash"></i>',
+                        "data-id": data,
+                    }).prop("outerHTML");
+
+                    const button_reset_password = $("<button>", {
+                        class: "btn btn-secondary btn-reset-password",
+                        type: "button",
+                        html: '<i class="icofont icofont-ui-password"></i>',
+                        "data-id": data,
+                    }).prop("outerHTML");
+
+                    const button_update_role = $("<button>", {
+                        class: "btn btn-success btn-update-role",
+                        type: "button",
+                        html: '<i class="icofont icofont-ui-user-group"></i>',
+                        "data-id": data,
+                    }).prop("outerHTML");
+
+                    const button_impersonate = $("<button>", {
+                        class: "btn btn-dark btn-impersonate",
+                        html: '<i class="icofont icofont-bug"></i>',
+                        "data-id": data,
+                        title: "Impersonate",
+                        "data-placement": "top",
+                        "data-toggle": "tooltip",
+                    });
+
+                    return $("<div>", {
+                        class: "btn-group",
+                        role: "group",
+                        "aria-label": "Aksi",
+                        html: () => {
+                            let arr = [];
+
+                            if (permissions.update) {
+                                arr.push(button_update_role);
+                                arr.push(button_reset_password);
+                                arr.push(button_edit);
+                                arr.push(button_impersonate);
+                            }
+                            // if (UPDATE) arr.push(button_edit)
+                            if (permissions.delete) arr.push(button_delete);
+
+                            return arr;
+                        },
+                    }).prop("outerHTML");
+                },
+            },
+            {
+                data: "created_at",
+            },
+        ],
+    });
+
+    $(document).on("click", ".btn-impersonate", function (e) {
+        e.preventDefault();
+        const userId = $(this).data("id");
+
+        Swal.fire({
+            title: "Impersonate pengguna ini?",
+            text: "Anda akan masuk sebagai user tersebut.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Ya, impersonate!",
+            cancelButtonText: "Batal",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = BASE_URL + `impersonate/start/${userId}`;
             }
-        }, {
-            data: 'id',
-            render: (data, type, row) => {
-                const button_edit = $('<button>', {
-                    class: 'btn btn-primary btn-update',
-                    type: 'button',
-                    html: '<i class="icofont icofont-ui-edit"></i>',
-                    'data-id': data,
-                }).prop('outerHTML');
-
-                const button_delete = $('<button>', {
-                    class: 'btn btn-danger btn-delete',
-                    type: 'button',
-                    html: '<i class="icofont icofont-trash"></i>',
-                    'data-id': data,
-                }).prop('outerHTML');
-
-                const button_reset_password = $('<button>', {
-                    class: 'btn btn-secondary btn-reset-password',
-                    type: 'button',
-                    html: '<i class="icofont icofont-ui-password"></i>',
-                    'data-id': data,
-                }).prop('outerHTML');
-
-                const button_update_role = $('<button>', {
-                    class: 'btn btn-success btn-update-role',
-                    type: 'button',
-                    html: '<i class="icofont icofont-ui-user-group"></i>',
-                    'data-id': data,
-                }).prop('outerHTML');
-
-                return $('<div>', {
-                    class: 'btn-group',
-                    role: 'group',
-                    'aria-label': 'Aksi',
-                    html: () => {
-                        let arr = [];
-
-                        if (permissions.update) {
-                            arr.push(button_update_role)
-                            arr.push(button_reset_password)
-                            arr.push(button_edit)
-                        }
-                        // if (UPDATE) arr.push(button_edit)
-                        if (permissions.delete) arr.push(button_delete)
-
-                        return arr;
-                    }
-                }).prop('outerHTML');
-            }
-        }, {
-            data: 'created_at'
-        }]
-    })
-})
+        });
+    });
+});

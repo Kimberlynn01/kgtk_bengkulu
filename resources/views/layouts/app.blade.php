@@ -46,10 +46,19 @@
                 </div>
                 <div class="nav-right col pull-right right-menu p-0">
                     <ul class="nav-menus">
+                        {{-- Impersonate --}}
+                        @if (@$isImpersonating)
+                            <li>
+                                <a href="{{ route('impersonate.stop') }}" class="btn btn-sm btn-danger">Stop
+                                    Impersonate :
+                                    <strong>{{ Auth::user()->name }}</strong></a>
+                            </li>
+                        @endif
                         <li><a class="text-dark" href="#!" onclick="javascript:toggleFullScreen()"><i
                                     data-feather="maximize"></i></a></li>
                         <li>
-                            <div class="notification-box"><i data-feather="bell"></i><span class="dot-animated"></span></div>
+                            <div class="notification-box"><i data-feather="bell"></i><span class="dot-animated"></span>
+                            </div>
                         </li>
                         <li>
                             <div class="mode"><i class="fa fa-moon-o"></i></div>
