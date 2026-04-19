@@ -65,5 +65,92 @@ class MenuSeeder extends Seeder
             'icon' => 'icofont icofont-ui-user',
             'is_active' => 1,
         ]);
+
+        $profil = [
+            ['Visi dan Misi', 'visi_misi', 'visi_misi', 'icofont-paper-plane'],
+            ['Tugas dan Fungsi', 'tugas_fungsi', 'tugas_fungsi', 'icofont-tasks-alt'],
+            ['Tim Kerja', 'tim_kerja', 'tim_kerja', 'icofont-users-alt-2'],
+            ['Janji & Maklumat Layanan', 'janji_maklumat', 'janji_maklumat', 'icofont-certificate-alt-1'],
+            ['Profil Pejabat Struktural', 'profil_pejabat', 'profil_pejabat', 'icofont-users-social'],
+        ];
+
+        foreach ($profil as $index => $m) {
+            Menu::create([
+                'name' => $m[0],
+                'menu_group_id' => 2,
+                'slug_name' => $m[1],
+                'menu_order' => $index + 1,
+                'link' => $m[2],
+                'icon' => 'icofont ' . $m[3],
+                'is_active' => 1,
+            ]);
+        }
+
+        $layanan = [
+            ['Informasi & Program', 'informasi_program', 'informasi_program', 'icofont-info-square'],
+            ['Kemitraan', 'kemitraan', 'kemitraan', 'icofont-handshake-deal'],
+            ['QnA', 'qna', 'qna', 'icofont-chat'],
+        ];
+
+        foreach ($layanan as $index => $m) {
+            Menu::create([
+                'name' => $m[0],
+                'menu_group_id' => 3,
+                'slug_name' => $m[1],
+                'menu_order' => $index + 1,
+                'link' => $m[2],
+                'icon' => 'icofont ' . $m[3],
+                'is_active' => 1,
+            ]);
+        }
+
+        $publikasi = [
+            ['Publikasi Artikel', 'artikel', 'artikel', 'icofont-read-book-alt'],
+            ['Berita', 'berita', 'berita', 'icofont-news'],
+            ['Survey Kepuasan (SKM)', 'skm', 'skm', 'icofont-listing-box'],
+            ['Hasil Survey SKM', 'hasil_survey', 'hasil_survey', 'icofont-chart-histogram-alt'],
+        ];
+
+        foreach ($publikasi as $index => $m) {
+            Menu::create([
+                'name' => $m[0],
+                'menu_group_id' => 4,
+                'slug_name' => $m[1],
+                'menu_order' => $index + 1,
+                'link' => $m[2],
+                'icon' => 'icofont ' . $m[3],
+                'is_active' => 1,
+            ]);
+        }
+
+        // Menu::create([
+        //     'name' => 'Pengguna',
+        //     'menu_group_id' => 5,
+        //     'slug_name' => 'pengguna',
+        //     'menu_order' => 1,
+        //     'link' => 'users',
+        //     'icon' => 'icofont icofont-ui-user-group',
+        //     'is_active' => 1,
+        // ]);
+
+        Menu::create([
+            'name' => 'Manajemen Menu',
+            'menu_group_id' => 5,
+            'slug_name' => 'manajemen_menu',
+            'menu_order' => 2,
+            'link' => 'manajemen-menu',
+            'icon' => 'icofont icofont-navigation-menu',
+            'is_active' => 1,
+        ]);
+
+        // Menu::create([
+        //     'name' => 'Otoritas',
+        //     'menu_group_id' => 5,
+        //     'slug_name' => 'otoritas',
+        //     'menu_order' => 3,
+        //     'link' => 'otoritas',
+        //     'icon' => 'icofont icofont-shield-alt',
+        //     'is_active' => 1,
+        // ]);
     }
 }

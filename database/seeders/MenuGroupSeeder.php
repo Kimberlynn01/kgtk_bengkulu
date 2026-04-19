@@ -16,9 +16,10 @@ class MenuGroupSeeder extends Seeder
     {
         $data = [
             'Beranda',
+            'Page Profil',
+            'Layanan Page',
+            'Publikasi',
             'Manajemen',
-            'Referensi',
-            'Data',
         ];
         DB::table('menu_groups')->truncate();
         foreach ($data as $key => $value) {
