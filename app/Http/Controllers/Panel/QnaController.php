@@ -6,17 +6,23 @@ use App\Models\Qna;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Validation\Rule;
+use App\Mail\QnaAnsweredMail;
+use Illuminate\Support\Facades\Mail;
 
 class QnaController extends Controller
 {
-    /**
-     * Menyimpan pertanyaan dari Guest (Landing Page)
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'category' => 'required|string',
+            'email' => 'required|email|max:255',
+            'instansi' => 'required|string|max:255',
+            'phone' => 'required|numeric',
+            'category' => [
+                'required',
+                Rule::in(['ppg', 'bcks', 'pkgbk', 'pkgsd mbi', 'stem' ,'pm/kka', 'ukkj', 'gpk mahir']),
+            ],
             'question' => 'required|string',
         ]);
 
@@ -63,23 +69,31 @@ class QnaController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'id' => 'required',
+            'id' => 'required|exists:qnas,id',
             'answer' => 'required',
         ]);
 
         $qna = Qna::findOrFail($request->id);
         $qna->update([
             'answer' => $request->answer,
-            'user_id' => auth()->id(), // Mencatat admin yang menjawab
+            'user_id' => auth()->id(),
         ]);
 
-        return response()->json(['message' => 'Jawaban berhasil disimpan!']);
+        try {
+            Mail::to($qna->email)->send(new QnaAnsweredMail($qna));
+        } catch (Exception $e) {
+            // Log error jika email gagal dikirim agar aplikasi tidak crash
+            \Log::error('Gagal mengirim email QnA: ' . $e->getMessage());
+        }
+
+        return response()->json(['message' => 'Jawaban berhasil disimpan dan email telah dikirim!']);
     }
 
     public function delete(Request $request)
     {
-        Qna::destroy($request->id);
+        $qna = Qna::findOrFail($request->id);
+        $qna->delete();
+
         return response()->json(['message' => 'Data berhasil dihapus!']);
     }
-
 }

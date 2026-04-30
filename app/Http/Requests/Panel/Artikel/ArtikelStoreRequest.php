@@ -8,7 +8,7 @@ class ArtikelStoreRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // For now, I'll use true since I don't know the exact slug for RBAC yet
+        return true;
     }
 
     public function rules(): array

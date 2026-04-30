@@ -27,15 +27,28 @@ $(() => {
         ],
     });
 
+    // VALIDASI UKURAN FILE (2MB)
+    $(document).on("change", 'input[type="file"]', function () {
+        if (this.files.length > 0 && this.files[0].size > 2 * 1024 * 1024) {
+            App.showToastr.error("File Terlalu Besar", "File melebihi 2MB.");
+            $(this).val("");
+            return false;
+        }
+    });
+
     $(".btn-tambah").on("click", function () {
         $("#form-tugas-fungsi")[0].reset();
         $("#id").val("");
+        $('input[type="file"]').val("");
         $("#existing-image").html("");
         $("#modal-tugas-fungsi").modal("show");
     });
 
     $("#table-data").on("click", ".btn-update", function () {
         let id = $(this).data("id");
+        $("#form-tugas-fungsi")[0].reset();
+        $('input[type="file"]').val("");
+
         $.get(BASE_URL + "tugas_fungsi/edit/" + id, (res) => {
             if (res.status) {
                 let data = res.data;
@@ -45,7 +58,10 @@ $(() => {
 
                 if (data.image) {
                     $("#existing-image").html(
-                        `<img src="${BASE_URL}storage/${data.image}" class="img-thumbnail" style="height: 150px;">`,
+                        `<div class="mt-2 border p-2 text-center rounded shadow-sm">
+                            <label class="d-block font-weight-bold">Gambar Saat Ini:</label>
+                            <img src="${BASE_URL}storage/${data.image}" class="img-thumbnail" style="height: 150px;">
+                        </div>`,
                     );
                 } else {
                     $("#existing-image").html("");
@@ -57,12 +73,10 @@ $(() => {
 
     $("#form-tugas-fungsi").on("submit", function (e) {
         e.preventDefault();
-
         let id = $("#id").val();
         let url = id
             ? BASE_URL + "tugas_fungsi/update"
             : BASE_URL + "tugas_fungsi/store";
-
         let formData = new FormData(this);
         if (id) formData.append("_method", "PATCH");
 
@@ -74,9 +88,12 @@ $(() => {
             contentType: false,
             beforeSend: () => {
                 $("#modal-tugas-fungsi .modal-content").LoadingOverlay("show");
+                $("#form-tugas-fungsi button[type='submit']").attr(
+                    "disabled",
+                    true,
+                );
             },
             success: (res) => {
-                $("#modal-tugas-fungsi .modal-content").LoadingOverlay("hide");
                 if (res.status) {
                     App.showToastr.success("Sukses", res.message);
                     $("#modal-tugas-fungsi").modal("hide");
@@ -84,12 +101,22 @@ $(() => {
                 }
             },
             error: (err) => {
-                $("#modal-tugas-fungsi .modal-content").LoadingOverlay("hide");
-                if (err.status == 422) {
-                    App.handleErrors.generate(err.responseJSON);
+                let res = err.responseJSON;
+                if (err.status == 422 && res && res.errors) {
+                    App.handleErrors.generate(res);
                 } else {
-                    App.showToastr.error("Error", err.responseJSON.message);
+                    App.showToastr.error(
+                        "Error",
+                        res ? res.message : "Sistem error",
+                    );
                 }
+            },
+            complete: () => {
+                $("#modal-tugas-fungsi .modal-content").LoadingOverlay("hide");
+                $("#form-tugas-fungsi button[type='submit']").attr(
+                    "disabled",
+                    false,
+                );
             },
         });
     });
@@ -115,7 +142,11 @@ $(() => {
                         }
                     },
                 ).fail((err) => {
-                    App.showToastr.error("Error", err.responseJSON.message);
+                    let res = err.responseJSON;
+                    App.showToastr.error(
+                        "Error",
+                        res ? res.message : "Gagal menghapus data.",
+                    );
                 });
             }
         });

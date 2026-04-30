@@ -12,6 +12,9 @@ class Qna extends Model
     protected $table;
     protected $fillable = [
         'name',
+        'email',
+        'instansi',
+        'phone',
         'category',
         'question',
         'answer',

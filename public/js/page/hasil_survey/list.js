@@ -27,15 +27,38 @@ $(() => {
         ],
     });
 
+    // VALIDASI UKURAN FILE (2MB)
+    $(document).on("change", 'input[type="file"]', function () {
+        const files = this.files;
+        const maxSize = 2 * 1024 * 1024; // 2MB
+
+        if (files.length > 0) {
+            if (files[0].size > maxSize) {
+                App.showToastr.error(
+                    "File Terlalu Besar",
+                    `File "${files[0].name}" melebihi 2MB.`,
+                );
+                $(this).val(""); // Reset input file
+                return false;
+            }
+        }
+    });
+
     $(".btn-tambah").on("click", function () {
         $("#form-hasil-survey")[0].reset();
         $("#id").val("");
+        $('input[type="file"]').val(""); // Reset input file anti-duplikat
         $("#existing-image").html("");
         $("#modal-hasil-survey").modal("show");
     });
 
     $("#table-data").on("click", ".btn-update", function () {
         let id = $(this).data("id");
+
+        // Reset form & input file sebelum load data baru
+        $("#form-hasil-survey")[0].reset();
+        $('input[type="file"]').val("");
+
         $.get(BASE_URL + "hasil_survey/edit/" + id, (res) => {
             if (res.status) {
                 let data = res.data;
@@ -45,7 +68,10 @@ $(() => {
 
                 if (data.image) {
                     $("#existing-image").html(
-                        `<img src="${BASE_URL}storage/${data.image}" class="img-thumbnail" style="height: 150px;">`,
+                        `<div class="mt-2 border p-2 text-center rounded shadow-sm">
+                            <label class="d-block font-weight-bold">Gambar Saat Ini:</label>
+                            <img src="${BASE_URL}storage/${data.image}" class="img-thumbnail" style="height: 150px;">
+                        </div>`,
                     );
                 } else {
                     $("#existing-image").html("");
@@ -74,9 +100,12 @@ $(() => {
             contentType: false,
             beforeSend: () => {
                 $("#modal-hasil-survey .modal-content").LoadingOverlay("show");
+                $("#form-hasil-survey button[type='submit']").attr(
+                    "disabled",
+                    true,
+                ); // Anti double-click
             },
             success: (res) => {
-                $("#modal-hasil-survey .modal-content").LoadingOverlay("hide");
                 if (res.status) {
                     App.showToastr.success("Sukses", res.message);
                     $("#modal-hasil-survey").modal("hide");
@@ -84,12 +113,34 @@ $(() => {
                 }
             },
             error: (err) => {
-                $("#modal-hasil-survey .modal-content").LoadingOverlay("hide");
-                if (err.status == 422) {
-                    App.handleErrors.generate(err.responseJSON);
-                } else {
-                    App.showToastr.error("Error", err.responseJSON.message);
+                let res = err.responseJSON;
+
+                // Handle Error 413 (File terlalu besar dari limit server)
+                if (err.status === 413) {
+                    App.showToastr.error(
+                        "Error",
+                        "Ukuran file terlalu besar untuk diproses server.",
+                    );
+                    return;
                 }
+
+                // Handle Error 422 (Validation Error dari Laravel)
+                if (err.status == 422 && res && res.errors) {
+                    App.handleErrors.generate(res);
+                } else {
+                    let msg =
+                        res && res.message
+                            ? res.message
+                            : "Terjadi kesalahan sistem.";
+                    App.showToastr.error("Error", msg);
+                }
+            },
+            complete: () => {
+                $("#modal-hasil-survey .modal-content").LoadingOverlay("hide");
+                $("#form-hasil-survey button[type='submit']").attr(
+                    "disabled",
+                    false,
+                );
             },
         });
     });
@@ -115,7 +166,12 @@ $(() => {
                         }
                     },
                 ).fail((err) => {
-                    App.showToastr.error("Error", err.responseJSON.message);
+                    let res = err.responseJSON;
+                    let msg =
+                        res && res.message
+                            ? res.message
+                            : "Gagal menghapus data.";
+                    App.showToastr.error("Error", msg);
                 });
             }
         });

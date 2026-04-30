@@ -15,6 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'rbac' => RbacCheck::class
         ]);
+
+        $middleware->validateCsrfTokens(except: [
+            'ask',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

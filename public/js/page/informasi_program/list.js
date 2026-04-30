@@ -27,15 +27,30 @@ $(() => {
         ],
     });
 
+    // Validasi Ukuran File
+    $(document).on("change", 'input[type="file"]', function () {
+        for (let i = 0; i < this.files.length; i++) {
+            if (this.files[i].size > 2 * 1024 * 1024) {
+                App.showToastr.error("Error", "File melebihi 2MB.");
+                $(this).val("");
+                return false;
+            }
+        }
+    });
+
     $(".btn-tambah").on("click", function () {
         $("#form-informasi-program")[0].reset();
         $("#id").val("");
+        $('input[type="file"]').val("");
         $("#existing-files").html("");
         $("#modal-informasi-program").modal("show");
     });
 
     $("#table-data").on("click", ".btn-update", function () {
         let id = $(this).data("id");
+        $("#form-informasi-program")[0].reset();
+        $('input[type="file"]').val("");
+
         $.get(BASE_URL + "informasi_program/edit/" + id, (res) => {
             if (res.status) {
                 let data = res.data;
@@ -45,11 +60,11 @@ $(() => {
                 let existingHtml = "";
                 data.files.forEach((f) => {
                     existingHtml += `
-                        <div class="col-md-12 mb-2 d-flex align-items-center justify-content-between" id="file-container-${f.id}">
+                        <div class="col-md-12 mb-2 p-2 border rounded d-flex align-items-center justify-content-between" id="file-container-${f.id}">
                             <span><i class="icofont icofont-file-document"></i> ${f.file.split("/").pop()}</span>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="deleted_files[]" value="${f.id}">
-                                <label class="form-check-label text-danger">Hapus</label>
+                            <div class="form-check d-flex align-items-center m-0">
+                                <input class="form-check-input" type="checkbox" name="deleted_files[]" value="${f.id}" id="del-file-ip-${f.id}" style="cursor: pointer;">
+                                <label class="form-check-label text-danger mb-0 ms-2" for="del-file-ip-${f.id}" style="cursor: pointer; font-size: 13px; font-weight: bold;">Hapus</label>
                             </div>
                         </div>
                     `;
@@ -62,12 +77,10 @@ $(() => {
 
     $("#form-informasi-program").on("submit", function (e) {
         e.preventDefault();
-
         let id = $("#id").val();
         let url = id
             ? BASE_URL + "informasi_program/update"
             : BASE_URL + "informasi_program/store";
-
         let formData = new FormData(this);
         if (id) formData.append("_method", "PATCH");
 
@@ -81,11 +94,12 @@ $(() => {
                 $("#modal-informasi-program .modal-content").LoadingOverlay(
                     "show",
                 );
+                $("#form-informasi-program button[type='submit']").attr(
+                    "disabled",
+                    true,
+                );
             },
             success: (res) => {
-                $("#modal-informasi-program .modal-content").LoadingOverlay(
-                    "hide",
-                );
                 if (res.status) {
                     App.showToastr.success("Sukses", res.message);
                     $("#modal-informasi-program").modal("hide");
@@ -93,14 +107,24 @@ $(() => {
                 }
             },
             error: (err) => {
+                let res = err.responseJSON;
+                if (err.status == 422 && res && res.errors) {
+                    App.handleErrors.generate(res);
+                } else {
+                    App.showToastr.error(
+                        "Error",
+                        res ? res.message : "Sistem error",
+                    );
+                }
+            },
+            complete: () => {
                 $("#modal-informasi-program .modal-content").LoadingOverlay(
                     "hide",
                 );
-                if (err.status == 422) {
-                    App.handleErrors.generate(err.responseJSON);
-                } else {
-                    App.showToastr.error("Error", err.responseJSON.message);
-                }
+                $("#form-informasi-program button[type='submit']").attr(
+                    "disabled",
+                    false,
+                );
             },
         });
     });
@@ -108,12 +132,11 @@ $(() => {
     $("#table-data").on("click", ".btn-delete", function () {
         let id = $(this).data("id");
         Swal.fire({
-            title: "Hapus Informasi & Program?",
-            text: "Data yang dihapus tidak dapat dikembalikan!",
+            title: "Hapus Data?",
+            text: "Data akan dihapus permanen!",
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Ya, Hapus!",
-            cancelButtonText: "Batal",
         }).then((result) => {
             if (result.isConfirmed) {
                 $.post(
@@ -126,7 +149,11 @@ $(() => {
                         }
                     },
                 ).fail((err) => {
-                    App.showToastr.error("Error", err.responseJSON.message);
+                    let res = err.responseJSON;
+                    App.showToastr.error(
+                        "Error",
+                        res ? res.message : "Gagal menghapus.",
+                    );
                 });
             }
         });

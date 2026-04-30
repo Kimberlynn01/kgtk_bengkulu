@@ -14,6 +14,7 @@ $(() => {
         columns: [
             { data: "DT_RowIndex", searchable: false, orderable: false },
             { data: "name" },
+            { data: "instansi" },
             { data: "category" },
             { data: "question" },
             {

@@ -9,7 +9,7 @@
         <div class="col-sm-12">
             <div class="card b-r-0 border-primary">
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-                    <h5>Daftar Pertanyaan & Jawaban (QnA)</h5>
+                    <h5>Daftar Pertanyaan & Jawaban</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -18,6 +18,7 @@
                                 <tr>
                                     <th style="width: 5%;">#</th>
                                     <th>Nama Penanya</th>
+                                    <th>Instansi</th>
                                     <th>Kategori</th>
                                     <th>Pertanyaan</th>
                                     <th>Status</th>
@@ -47,17 +48,29 @@
                         <input type="hidden" name="id" id="id">
 
                         <div class="row mb-3">
-                            <div class="col-md-6">
+                            <div class="col-md-6 mb-2">
                                 <label class="fw-bold">Penanya:</label>
-                                <p id="show-name" class="text-muted"></p>
+                                <p id="show-name" class="text-muted mb-0"></p>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 mb-2">
+                                <label class="fw-bold">Email:</label>
+                                <p id="show-email" class="text-muted mb-0"></p>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label class="fw-bold">Instansi:</label>
+                                <p id="show-instansi" class="text-muted mb-0"></p>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label class="fw-bold">No. Telepon:</label>
+                                <p id="show-phone" class="text-muted mb-0"></p>
+                            </div>
+                            <div class="col-md-12 mb-2">
                                 <label class="fw-bold">Kategori:</label>
-                                <p id="show-category" class="text-muted"></p>
+                                <p id="show-category" class="text-muted mb-0"></p>
                             </div>
-                            <div class="col-12">
+                            <div class="col-12 mt-2">
                                 <label class="fw-bold">Isi Pertanyaan:</label>
-                                <div class="p-3 bg-light rounded" id="show-question"></div>
+                                <div class="p-3  rounded" id="show-question"></div>
                             </div>
                         </div>
 
@@ -73,8 +86,8 @@
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" value="1" id="is_published" checked
                                 disabled>
-                            <label class="form-check-label text-muted" for="is_published small">
-                                Pertanyaan yang dijawab akan otomatis tampil di Landing Page.
+                            <label class="form-check-label text-muted" for="is_published">
+                                <small>Pertanyaan yang dijawab akan otomatis tampil di Landing Page.</small>
                             </label>
                         </div>
                     </div>
@@ -89,6 +102,5 @@
 @endsection
 
 @push('scripts')
-    {{-- Pastikan folder dan file js ini sudah kamu buat --}}
     <script src="{{ asset('js/page/qna/list.js') }}"></script>
 @endpush

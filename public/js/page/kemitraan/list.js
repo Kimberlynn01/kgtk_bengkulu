@@ -27,15 +27,30 @@ $(() => {
         ],
     });
 
+    // Validasi Ukuran File
+    $(document).on("change", 'input[type="file"]', function () {
+        for (let i = 0; i < this.files.length; i++) {
+            if (this.files[i].size > 2 * 1024 * 1024) {
+                App.showToastr.error("Error", "File melebihi 2MB.");
+                $(this).val("");
+                return false;
+            }
+        }
+    });
+
     $(".btn-tambah").on("click", function () {
         $("#form-kemitraan")[0].reset();
         $("#id").val("");
+        $('input[type="file"]').val("");
         $("#existing-files").html("");
         $("#modal-kemitraan").modal("show");
     });
 
     $("#table-data").on("click", ".btn-update", function () {
         let id = $(this).data("id");
+        $("#form-kemitraan")[0].reset();
+        $('input[type="file"]').val("");
+
         $.get(BASE_URL + "kemitraan/edit/" + id, (res) => {
             if (res.status) {
                 let data = res.data;
@@ -46,11 +61,11 @@ $(() => {
                 let existingHtml = "";
                 data.files.forEach((f) => {
                     existingHtml += `
-                        <div class="col-md-12 mb-2 d-flex align-items-center justify-content-between" id="file-container-${f.id}">
+                        <div class="col-md-12 mb-2 p-2 border rounded d-flex align-items-center justify-content-between" id="file-container-${f.id}">
                             <span><i class="icofont icofont-file-document"></i> ${f.file.split("/").pop()}</span>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="deleted_files[]" value="${f.id}">
-                                <label class="form-check-label text-danger">Hapus</label>
+                            <div class="form-check d-flex align-items-center m-0">
+                                <input class="form-check-input" type="checkbox" name="deleted_files[]" value="${f.id}" id="del-file-km-${f.id}" style="cursor: pointer;">
+                                <label class="form-check-label text-danger mb-0 ms-2" for="del-file-km-${f.id}" style="cursor: pointer; font-size: 13px; font-weight: bold;">Hapus</label>
                             </div>
                         </div>
                     `;
@@ -63,12 +78,10 @@ $(() => {
 
     $("#form-kemitraan").on("submit", function (e) {
         e.preventDefault();
-
         let id = $("#id").val();
         let url = id
             ? BASE_URL + "kemitraan/update"
             : BASE_URL + "kemitraan/store";
-
         let formData = new FormData(this);
         if (id) formData.append("_method", "PATCH");
 
@@ -80,9 +93,12 @@ $(() => {
             contentType: false,
             beforeSend: () => {
                 $("#modal-kemitraan .modal-content").LoadingOverlay("show");
+                $("#form-kemitraan button[type='submit']").attr(
+                    "disabled",
+                    true,
+                );
             },
             success: (res) => {
-                $("#modal-kemitraan .modal-content").LoadingOverlay("hide");
                 if (res.status) {
                     App.showToastr.success("Sukses", res.message);
                     $("#modal-kemitraan").modal("hide");
@@ -90,12 +106,22 @@ $(() => {
                 }
             },
             error: (err) => {
-                $("#modal-kemitraan .modal-content").LoadingOverlay("hide");
-                if (err.status == 422) {
-                    App.handleErrors.generate(err.responseJSON);
+                let res = err.responseJSON;
+                if (err.status == 422 && res && res.errors) {
+                    App.handleErrors.generate(res);
                 } else {
-                    App.showToastr.error("Error", err.responseJSON.message);
+                    App.showToastr.error(
+                        "Error",
+                        res ? res.message : "Sistem error",
+                    );
                 }
+            },
+            complete: () => {
+                $("#modal-kemitraan .modal-content").LoadingOverlay("hide");
+                $("#form-kemitraan button[type='submit']").attr(
+                    "disabled",
+                    false,
+                );
             },
         });
     });
@@ -104,11 +130,10 @@ $(() => {
         let id = $(this).data("id");
         Swal.fire({
             title: "Hapus Kemitraan?",
-            text: "Data yang dihapus tidak dapat dikembalikan!",
+            text: "Data akan dihapus permanen!",
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Ya, Hapus!",
-            cancelButtonText: "Batal",
         }).then((result) => {
             if (result.isConfirmed) {
                 $.post(
@@ -121,7 +146,11 @@ $(() => {
                         }
                     },
                 ).fail((err) => {
-                    App.showToastr.error("Error", err.responseJSON.message);
+                    let res = err.responseJSON;
+                    App.showToastr.error(
+                        "Error",
+                        res ? res.message : "Gagal menghapus.",
+                    );
                 });
             }
         });

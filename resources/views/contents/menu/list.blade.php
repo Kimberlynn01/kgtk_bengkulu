@@ -9,11 +9,14 @@
         @if (rbacCheck('manajemen_menu', 2))
             <div class="col-sm-12 text-right mb-2">
                 <div class="bookmark">
-                    <ul>
-                        <li><a href="javascript:void(0)" data-container="body" data-bs-toggle="popover" data-placement="top"
-                                title="Tambah Menu" data-original-title="Tables" class="btn-tambah"><i
-                                    data-feather="plus-square"></i></a></li>
-
+                    <ul class="list-unstyled m-0 d-flex justify-content-end">
+                        <li>
+                            <a href="javascript:void(0)" class="btn-tambah btn btn-sm  d-inline-flex align-items-center px-3"
+                                style="height: 34px; border-radius: 6px; font-weight: 500; font-size: 13px; gap: 8px;">
+                                <i data-feather="plus" style="width: 16px; height: 16px;"></i>
+                                <span>Tambah Data</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>

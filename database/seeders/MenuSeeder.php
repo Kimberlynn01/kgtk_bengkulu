@@ -28,7 +28,7 @@ class MenuSeeder extends Seeder
 
         Menu::create([
             'name' => 'Pengguna',
-            'menu_group_id' => 2,
+            'menu_group_id' => 5,
             'slug_name' => 'pengguna',
             'menu_order' => 2,
             'link' => 'users',
@@ -36,19 +36,19 @@ class MenuSeeder extends Seeder
             'is_active' => 1,
         ]);
 
-        Menu::create([
-            'name' => 'Manajemen Menu',
-            'menu_group_id' => 2,
-            'slug_name' => 'manajemen_menu',
-            'menu_order' => 3,
-            'link' => 'manajemen-menu',
-            'icon' => 'icofont icofont-navigation-menu',
-            'is_active' => 1,
-        ]);
+        // Menu::create([
+        //     'name' => 'Manajemen Menu',
+        //     'menu_group_id' => 2,
+        //     'slug_name' => 'manajemen_menu',
+        //     'menu_order' => 3,
+        //     'link' => 'manajemen-menu',
+        //     'icon' => 'icofont icofont-navigation-menu',
+        //     'is_active' => 1,
+        // ]);
 
         Menu::create([
             'name' => 'Otoritas',
-            'menu_group_id' => 2,
+            'menu_group_id' => 5,
             'slug_name' => 'otoritas',
             'menu_order' => 4,
             'link' => 'otoritas',

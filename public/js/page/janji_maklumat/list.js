@@ -27,9 +27,27 @@ $(() => {
         ],
     });
 
+    // VALIDASI UKURAN FILE (2MB)
+    $(document).on("change", 'input[type="file"]', function () {
+        const files = this.files;
+        const maxSize = 2 * 1024 * 1024; // 2MB
+
+        for (let i = 0; i < files.length; i++) {
+            if (files[i].size > maxSize) {
+                App.showToastr.error(
+                    "File Terlalu Besar",
+                    `File "${files[i].name}" melebihi 2MB.`,
+                );
+                $(this).val(""); // Reset input agar file tidak terkirim
+                return false;
+            }
+        }
+    });
+
     $(".btn-tambah").on("click", function () {
         $("#form-janji-maklumat")[0].reset();
         $("#id").val("");
+        $("#images").val(""); // Pastikan input file bersih
         $("#existing-images").html("");
         $("#preview-images").html("");
         $("#modal-janji-maklumat").modal("show");
@@ -37,6 +55,12 @@ $(() => {
 
     $("#table-data").on("click", ".btn-update", function () {
         let id = $(this).data("id");
+
+        // Reset form dan input file sebelum load data untuk mencegah duplikasi state
+        $("#form-janji-maklumat")[0].reset();
+        $("#images").val("");
+        $("#preview-images").html("");
+
         $.get(BASE_URL + "janji_maklumat/edit/" + id, (res) => {
             if (res.status) {
                 let data = res.data;
@@ -46,17 +70,20 @@ $(() => {
                 let existingHtml = "";
                 data.images.forEach((img) => {
                     existingHtml += `
-                        <div class="col-md-3 mb-2 text-center" id="img-container-${img.id}">
-                            <img src="${BASE_URL}storage/${img.image}" class="img-thumbnail" style="height: 100px;">
-                            <div class="form-check mt-1">
-                                <input class="form-check-input" type="checkbox" name="deleted_images[]" value="${img.id}">
-                                <label class="form-check-label text-danger">Hapus</label>
+                        <div class="col-md-3 mb-3 text-center" id="img-container-${img.id}">
+                            <div class="border p-2 rounded shadow-sm">
+                                <img src="${BASE_URL}storage/${img.image}" class="img-thumbnail mb-2" style="height: 100px; width: 100%; object-fit: cover;">
+                                <div class="form-check d-flex justify-content-center align-items-center m-0" style="gap: 5px;">
+                                    <input class="form-check-input" type="checkbox" name="deleted_images[]" value="${img.id}" id="del-img-${img.id}" style="cursor: pointer;">
+                                    <label class="form-check-label text-danger mb-0" for="del-img-${img.id}" style="cursor: pointer; font-size: 12px; font-weight: bold;">
+                                        Hapus
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     `;
                 });
                 $("#existing-images").html(existingHtml);
-                $("#preview-images").html("");
                 $("#modal-janji-maklumat").modal("show");
             }
         });
@@ -83,11 +110,12 @@ $(() => {
                 $("#modal-janji-maklumat .modal-content").LoadingOverlay(
                     "show",
                 );
+                $("#form-janji-maklumat button[type='submit']").attr(
+                    "disabled",
+                    true,
+                ); // Anti double-click
             },
             success: (res) => {
-                $("#modal-janji-maklumat .modal-content").LoadingOverlay(
-                    "hide",
-                );
                 if (res.status) {
                     App.showToastr.success("Sukses", res.message);
                     $("#modal-janji-maklumat").modal("hide");
@@ -95,14 +123,30 @@ $(() => {
                 }
             },
             error: (err) => {
+                let res = err.responseJSON;
+                if (err.status === 413) {
+                    App.showToastr.error(
+                        "Error",
+                        "Ukuran total file terlalu besar.",
+                    );
+                } else if (err.status == 422 && res && res.errors) {
+                    App.handleErrors.generate(res);
+                } else {
+                    let msg =
+                        res && res.message
+                            ? res.message
+                            : "Terjadi kesalahan sistem.";
+                    App.showToastr.error("Error", msg);
+                }
+            },
+            complete: () => {
                 $("#modal-janji-maklumat .modal-content").LoadingOverlay(
                     "hide",
                 );
-                if (err.status == 422) {
-                    App.handleErrors.generate(err.responseJSON);
-                } else {
-                    App.showToastr.error("Error", err.responseJSON.message);
-                }
+                $("#form-janji-maklumat button[type='submit']").attr(
+                    "disabled",
+                    false,
+                );
             },
         });
     });
@@ -128,7 +172,12 @@ $(() => {
                         }
                     },
                 ).fail((err) => {
-                    App.showToastr.error("Error", err.responseJSON.message);
+                    let res = err.responseJSON;
+                    let msg =
+                        res && res.message
+                            ? res.message
+                            : "Gagal menghapus data.";
+                    App.showToastr.error("Error", msg);
                 });
             }
         });

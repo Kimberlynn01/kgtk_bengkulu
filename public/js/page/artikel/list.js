@@ -3,8 +3,10 @@ let editor;
 
 $(() => {
     // Initialize CKEditor
-    CKEDITOR.replace("content");
-    editor = CKEDITOR.instances.content;
+    if ($("#content").length > 0) {
+        CKEDITOR.replace("content");
+        editor = CKEDITOR.instances.content;
+    }
 
     table = $("#table-data").DataTable({
         language: App.options.dt,
@@ -33,39 +35,74 @@ $(() => {
         ],
     });
 
+    // VALIDASI UKURAN FILE (2MB)
+    $(document).on("change", 'input[type="file"]', function () {
+        const maxSize = 2 * 1024 * 1024;
+        for (let i = 0; i < this.files.length; i++) {
+            if (this.files[i].size > maxSize) {
+                App.showToastr.error(
+                    "Error",
+                    `File "${this.files[i].name}" melebihi 2MB.`,
+                );
+                $(this).val("");
+                return false;
+            }
+        }
+    });
+
     $(".btn-tambah").on("click", function () {
         $("#form-artikel")[0].reset();
         $("#id").val("");
-        editor.setData("");
+        if (editor) editor.setData("");
+
+        $('input[type="file"]').val("");
         $("#existing-images").html("");
         $("#preview-images").html("");
+
         $("#modal-artikel").modal("show");
     });
 
     $("#table-data").on("click", ".btn-update", function () {
         let id = $(this).data("id");
+
+        // Reset state
+        $("#form-artikel")[0].reset();
+        $('input[type="file"]').val("");
+        $("#preview-images").html("");
+
         $.get(BASE_URL + "artikel/edit/" + id, (res) => {
             if (res.status) {
                 let data = res.data;
                 $("#id").val(data.id);
-                $("#date").val(data.date);
+
+                // --- PERBAIKAN TANGGAL ---
+                // Jika input type="date", formatnya HARUS YYYY-MM-DD
+                if (data.date) {
+                    let dateVal = data.date.split(" ")[0]; // Mengambil YYYY-MM-DD jika dari DB ada jamnya
+                    $("#date").val(dateVal);
+                }
+
                 $("#title").val(data.title);
-                editor.setData(data.content);
+                if (editor) editor.setData(data.content);
 
                 let existingHtml = "";
-                data.images.forEach((img) => {
-                    existingHtml += `
-                        <div class="col-md-3 mb-2 text-center" id="img-container-${img.id}">
-                            <img src="${BASE_URL}storage/${img.image}" class="img-thumbnail" style="height: 100px;">
-                            <div class="form-check mt-1">
-                                <input class="form-check-input" type="checkbox" name="deleted_images[]" value="${img.id}">
-                                <label class="form-check-label text-danger">Hapus</label>
+                if (data.images && data.images.length > 0) {
+                    data.images.forEach((img) => {
+                        existingHtml += `
+                            <div class="col-md-3 mb-3 text-center" id="img-container-${img.id}">
+                                <div class="border p-2 rounded shadow-sm">
+                                    <img src="${BASE_URL}storage/${img.image}" class="img-thumbnail mb-2" style="height: 100px; width: 100%; object-fit: cover;">
+                                    <div class="form-check d-flex justify-content-center align-items-center m-0" style="gap: 5px;">
+                                        <input class="form-check-input" type="checkbox" name="deleted_images[]" value="${img.id}" id="del-art-img-${img.id}" style="cursor: pointer;">
+                                        <label class="form-check-label text-danger mb-0" for="del-art-img-${img.id}" style="cursor: pointer; font-size: 12px; font-weight: bold;">Hapus</label>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    `;
-                });
+                        `;
+                    });
+                }
+
                 $("#existing-images").html(existingHtml);
-                $("#preview-images").html("");
                 $("#modal-artikel").modal("show");
             }
         });
@@ -73,12 +110,10 @@ $(() => {
 
     $("#form-artikel").on("submit", function (e) {
         e.preventDefault();
-        editor.updateElement();
+        if (editor) editor.updateElement();
 
         let id = $("#id").val();
         let url = id ? BASE_URL + "artikel/update" : BASE_URL + "artikel/store";
-        let method = "POST"; // Both store and update use POST (update uses _method PATCH if needed, but I'll use POST with payload if my controller supports it or specify it in form)
-
         let formData = new FormData(this);
         if (id) formData.append("_method", "PATCH");
 
@@ -90,9 +125,9 @@ $(() => {
             contentType: false,
             beforeSend: () => {
                 $("#modal-artikel .modal-content").LoadingOverlay("show");
+                $("#form-artikel button[type='submit']").attr("disabled", true);
             },
             success: (res) => {
-                $("#modal-artikel .modal-content").LoadingOverlay("hide");
                 if (res.status) {
                     App.showToastr.success("Sukses", res.message);
                     $("#modal-artikel").modal("hide");
@@ -100,12 +135,22 @@ $(() => {
                 }
             },
             error: (err) => {
-                $("#modal-artikel .modal-content").LoadingOverlay("hide");
-                if (err.status == 422) {
-                    App.handleErrors.generate(err.responseJSON);
+                let res = err.responseJSON;
+                if (err.status == 422 && res && res.errors) {
+                    App.handleErrors.generate(res);
                 } else {
-                    App.showToastr.error("Error", err.responseJSON.message);
+                    App.showToastr.error(
+                        "Error",
+                        res ? res.message : "Terjadi kesalahan.",
+                    );
                 }
+            },
+            complete: () => {
+                $("#modal-artikel .modal-content").LoadingOverlay("hide");
+                $("#form-artikel button[type='submit']").attr(
+                    "disabled",
+                    false,
+                );
             },
         });
     });
@@ -114,11 +159,10 @@ $(() => {
         let id = $(this).data("id");
         Swal.fire({
             title: "Hapus Artikel?",
-            text: "Data yang dihapus tidak dapat dikembalikan!",
+            text: "Data akan dihapus permanen!",
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Ya, Hapus!",
-            cancelButtonText: "Batal",
         }).then((result) => {
             if (result.isConfirmed) {
                 $.post(
@@ -131,7 +175,7 @@ $(() => {
                         }
                     },
                 ).fail((err) => {
-                    App.showToastr.error("Error", err.responseJSON.message);
+                    App.showToastr.error("Error", "Gagal menghapus data.");
                 });
             }
         });

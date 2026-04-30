@@ -27,16 +27,31 @@ $(() => {
         ],
     });
 
+    // Validasi 2MB
+    $(document).on("change", 'input[type="file"]', function () {
+        const maxSize = 2 * 1024 * 1024;
+        for (let i = 0; i < this.files.length; i++) {
+            if (this.files[i].size > maxSize) {
+                App.showToastr.error("Error", "File melebihi 2MB.");
+                $(this).val("");
+                return false;
+            }
+        }
+    });
+
     $(".btn-tambah").on("click", function () {
         $("#form-tim-kerja")[0].reset();
         $("#id").val("");
+        $("#images").val("");
         $("#existing-images").html("");
-        $("#preview-images").html("");
         $("#modal-tim-kerja").modal("show");
     });
 
     $("#table-data").on("click", ".btn-update", function () {
         let id = $(this).data("id");
+        $("#form-tim-kerja")[0].reset();
+        $("#images").val("");
+
         $.get(BASE_URL + "tim_kerja/edit/" + id, (res) => {
             if (res.status) {
                 let data = res.data;
@@ -47,17 +62,18 @@ $(() => {
                 let existingHtml = "";
                 data.images.forEach((img) => {
                     existingHtml += `
-                        <div class="col-md-3 mb-2 text-center" id="img-container-${img.id}">
-                            <img src="${BASE_URL}storage/${img.image}" class="img-thumbnail" style="height: 100px;">
-                            <div class="form-check mt-1">
-                                <input class="form-check-input" type="checkbox" name="deleted_images[]" value="${img.id}">
-                                <label class="form-check-label text-danger">Hapus</label>
+                        <div class="col-md-3 mb-3 text-center" id="img-container-${img.id}">
+                            <div class="border p-2 rounded shadow-sm">
+                                <img src="${BASE_URL}storage/${img.image}" class="img-thumbnail mb-2" style="height: 100px; width: 100%; object-fit: cover;">
+                                <div class="form-check d-flex justify-content-center align-items-center m-0" style="gap: 5px;">
+                                    <input class="form-check-input" type="checkbox" name="deleted_images[]" value="${img.id}" id="del-img-tk-${img.id}" style="cursor: pointer;">
+                                    <label class="form-check-label text-danger mb-0" for="del-img-tk-${img.id}" style="cursor: pointer; font-size: 12px; font-weight: bold;">Hapus</label>
+                                </div>
                             </div>
                         </div>
                     `;
                 });
                 $("#existing-images").html(existingHtml);
-                $("#preview-images").html("");
                 $("#modal-tim-kerja").modal("show");
             }
         });
@@ -65,12 +81,10 @@ $(() => {
 
     $("#form-tim-kerja").on("submit", function (e) {
         e.preventDefault();
-
         let id = $("#id").val();
         let url = id
             ? BASE_URL + "tim_kerja/update"
             : BASE_URL + "tim_kerja/store";
-
         let formData = new FormData(this);
         if (id) formData.append("_method", "PATCH");
 
@@ -82,9 +96,12 @@ $(() => {
             contentType: false,
             beforeSend: () => {
                 $("#modal-tim-kerja .modal-content").LoadingOverlay("show");
+                $("#form-tim-kerja button[type='submit']").attr(
+                    "disabled",
+                    true,
+                );
             },
             success: (res) => {
-                $("#modal-tim-kerja .modal-content").LoadingOverlay("hide");
                 if (res.status) {
                     App.showToastr.success("Sukses", res.message);
                     $("#modal-tim-kerja").modal("hide");
@@ -92,12 +109,22 @@ $(() => {
                 }
             },
             error: (err) => {
-                $("#modal-tim-kerja .modal-content").LoadingOverlay("hide");
-                if (err.status == 422) {
-                    App.handleErrors.generate(err.responseJSON);
+                let res = err.responseJSON;
+                if (err.status == 422 && res && res.errors) {
+                    App.handleErrors.generate(res);
                 } else {
-                    App.showToastr.error("Error", err.responseJSON.message);
+                    App.showToastr.error(
+                        "Error",
+                        res ? res.message : "Sistem error",
+                    );
                 }
+            },
+            complete: () => {
+                $("#modal-tim-kerja .modal-content").LoadingOverlay("hide");
+                $("#form-tim-kerja button[type='submit']").attr(
+                    "disabled",
+                    false,
+                );
             },
         });
     });
@@ -123,7 +150,11 @@ $(() => {
                         }
                     },
                 ).fail((err) => {
-                    App.showToastr.error("Error", err.responseJSON.message);
+                    let res = err.responseJSON;
+                    App.showToastr.error(
+                        "Error",
+                        res ? res.message : "Gagal menghapus data.",
+                    );
                 });
             }
         });
