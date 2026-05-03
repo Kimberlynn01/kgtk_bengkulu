@@ -77,7 +77,7 @@
                         <hr>
 
                         <div class="form-group mb-3">
-                            <label for="answer" class="fw-bold text-primary">Jawaban Admin</label>
+                            <label for="answer" class="fw-bold ">Jawaban Admin</label>
                             <textarea name="answer" id="answer" class="form-control" rows="6" placeholder="Masukkan jawaban resmi..."
                                 required></textarea>
                             <div id="error-answer"></div>

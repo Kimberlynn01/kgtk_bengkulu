@@ -25,4 +25,6 @@ Route::prefix('v1')->group(function () {
     // Layanan
     Route::get('/informasi-programs', [LayananController::class, 'getInformasiPrograms']);
     Route::get('/kemitraans', [LayananController::class, 'getKemitraans']);
+
+    Route::post('/ask', [QnaController::class, 'ask']); // Endpoint baru untuk kirim pertanyaan
 });

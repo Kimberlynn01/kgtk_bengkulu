@@ -23,6 +23,13 @@ class ProfilPejabatController extends Controller
         ]);
     }
 
+    public function show()
+    {
+        $profilPejabat = ProfilPejabat::with('images')->get();
+
+        return view('front.profil.profile_pejabat_struktural', compact('profilPejabat'));
+    }
+
     public function datatable()
     {
         return DataTables::of(ProfilPejabat::query())

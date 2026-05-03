@@ -26,6 +26,11 @@ class Artikel extends Model
         });
     }
 
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
     public function images(): HasMany
     {
         return $this->hasMany(ArtikelImage::class);

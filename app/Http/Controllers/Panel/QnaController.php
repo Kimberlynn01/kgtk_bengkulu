@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Mail;
 
 class QnaController extends Controller
 {
+
+
     public function store(Request $request)
     {
         $validated = $request->validate([

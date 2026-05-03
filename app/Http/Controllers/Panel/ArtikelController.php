@@ -23,6 +23,29 @@ class ArtikelController extends Controller
         ]);
     }
 
+    public function show()
+    {
+        $artikels = Artikel::with('images')->latest()->paginate(9);
+
+        return view('front.publikasi.artikel.list', compact('artikels'));
+    }
+
+    public function showBySlug($slug)
+    {
+        try {
+            $artikel = Artikel::with('images')
+                ->where('slug', $slug)
+                ->firstOrFail();
+
+            return view('front.publikasi.artikel.show', [
+                'title' => $artikel->title,
+                'artikel' => $artikel
+            ]);
+        } catch (Exception $e) {
+            abort(404, 'Artikel tidak ditemukan.');
+        }
+    }
+
     public function datatable()
     {
         return DataTables::of(Artikel::query()->latest('date'))

@@ -23,6 +23,12 @@ class VisiMisiController extends Controller
         ]);
     }
 
+    public function show() {
+        $visiMisi = VisiMisi::with('images')->get();
+
+        return view('front.profil.visi_misi', compact('visiMisi'));
+    }
+
     public function datatable()
     {
         return DataTables::of(VisiMisi::query())

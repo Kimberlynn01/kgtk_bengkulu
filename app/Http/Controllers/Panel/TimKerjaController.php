@@ -23,6 +23,13 @@ class TimKerjaController extends Controller
         ]);
     }
 
+    public function show()
+    {
+        $timKerja = TimKerja::with('images')->get();
+
+        return view('front.profil.tim_kerja',compact('timKerja'));
+    }
+
     public function datatable()
     {
         return DataTables::of(TimKerja::query())

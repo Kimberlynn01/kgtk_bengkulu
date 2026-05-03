@@ -22,6 +22,13 @@ class TugasFungsiController extends Controller
         ]);
     }
 
+    public function show()
+    {
+        $tugasFungsi = TugasFungsi::all();
+
+        return view('front.profil.tugas_fungsi', compact('tugasFungsi'));
+    }
+
     public function datatable()
     {
         return DataTables::of(TugasFungsi::query())

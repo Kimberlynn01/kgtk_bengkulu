@@ -46,13 +46,15 @@ $(() => {
     $("#table-data").on("click", ".btn-update", function () {
         let id = $(this).data("id");
         $.get(BASE_URL + "qna/edit/" + id, (res) => {
-            // Jika res langsung data objek (seperti pada controller sebelumnya)
             if (res) {
                 $("#id").val(res.id);
                 $("#show-name").text(res.name);
+                $("#show-email").text(res.email);
+                $("#show-instansi").text(res.instansi);
+                $("#show-phone").text(res.phone);
                 $("#show-category").text(res.category);
                 $("#show-question").text(res.question);
-                $("#answer").val(res.answer); // Tampilkan jawaban jika sudah ada
+                $("#answer").val(res.answer);
 
                 $("#modal-qna").modal("show");
             }
@@ -66,7 +68,6 @@ $(() => {
         e.preventDefault();
 
         let formData = new FormData(this);
-        // Karena kita mengupdate jawaban, gunakan PATCH sesuai route RBAC 3
         formData.append("_method", "PATCH");
 
         $.ajax({
@@ -80,7 +81,7 @@ $(() => {
             },
             success: (res) => {
                 $("#modal-qna .modal-content").LoadingOverlay("hide");
-                // Sesuaikan pengecekan success (bisa res.status atau res.message)
+
                 App.showToastr.success(
                     "Sukses",
                     res.message || "Jawaban berhasil disimpan",

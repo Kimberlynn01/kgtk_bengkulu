@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Str;
 
 class BeritaController extends Controller
 {
@@ -21,6 +22,29 @@ class BeritaController extends Controller
             'title' => 'Daftar Berita',
             'plugins' => ['datatable', 'ckeditor']
         ]);
+    }
+
+    public function show()
+    {
+        $beritas = Berita::with('images')->latest()->paginate(9);
+
+        return view('front.publikasi.berita.list', compact('beritas'));
+    }
+
+    public function showBySlug($slug)
+    {
+        try {
+            $berita = Berita::with('images')
+                ->where('slug', $slug)
+                ->firstOrFail();
+
+            return view('front.publikasi.berita.show', [
+                'title' => $berita->title,
+                'berita' => $berita
+            ]);
+        } catch (Exception $e) {
+            abort(404, 'Berita tidak ditemukan.');
+        }
     }
 
     public function datatable()

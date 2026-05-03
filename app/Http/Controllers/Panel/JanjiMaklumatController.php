@@ -23,6 +23,13 @@ class JanjiMaklumatController extends Controller
         ]);
     }
 
+    public function show()
+    {
+        $janjiMaklumat = JanjiMaklumat::with('images')->get();
+
+        return view('front.profil.janji_maklumat', compact('janjiMaklumat'));
+    }
+
     public function datatable()
     {
         return DataTables::of(JanjiMaklumat::query())

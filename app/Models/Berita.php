@@ -25,6 +25,11 @@ class Berita extends Model
         });
     }
 
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
     public function images(): HasMany
     {
         return $this->hasMany(BeritaImage::class);

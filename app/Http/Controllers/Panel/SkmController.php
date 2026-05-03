@@ -21,6 +21,13 @@ class SkmController extends Controller
         ]);
     }
 
+    public function show()
+    {
+        $skm = Skm::latest()->first();
+
+        return view('front.publikasi.skm', compact('skm'));
+    }
+
     public function datatable()
     {
         return DataTables::of(Skm::query())

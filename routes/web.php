@@ -31,3 +31,8 @@ Route::middleware('auth')->group(function () {
 require __DIR__ . '/auth.php';
 require __DIR__ . '/panel/qna.php';
 
+// FRONT-END
+require __DIR__ . '/panel/front-publikasi.php';
+require __DIR__ . '/panel/front-layanan.php';
+require __DIR__ . '/panel/front-profil_kgtk.php';
+

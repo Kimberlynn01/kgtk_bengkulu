@@ -22,6 +22,13 @@ class HasilSurveyController extends Controller
         ]);
     }
 
+    public function show()
+    {
+        $hasilSurveys = HasilSurvey::all();
+
+        return view('front.publikasi.hasil_skm', compact('hasilSurveys'));
+    }
+
     public function datatable()
     {
         return DataTables::of(HasilSurvey::query())

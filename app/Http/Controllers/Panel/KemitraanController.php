@@ -23,6 +23,13 @@ class KemitraanController extends Controller
         ]);
     }
 
+    public function show()
+    {
+        $kemitraans = Kemitraan::all();
+
+        return view('front.layanan.kemitraan', compact('kemitraans'));
+    }
+
     public function datatable()
     {
         return DataTables::of(Kemitraan::query())
