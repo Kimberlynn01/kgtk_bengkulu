@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\LayananController;
 use App\Http\Controllers\Api\ProfilController;
 use App\Http\Controllers\Api\PublikasiController;
+use App\Http\Controllers\Api\QnaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,5 +27,5 @@ Route::prefix('v1')->group(function () {
     Route::get('/informasi-programs', [LayananController::class, 'getInformasiPrograms']);
     Route::get('/kemitraans', [LayananController::class, 'getKemitraans']);
 
-    Route::post('/ask', [QnaController::class, 'ask']); // Endpoint baru untuk kirim pertanyaan
+    Route::post('/ask', [QnaController::class, 'ask']);
 });
