@@ -20,7 +20,7 @@ return new class extends Migration
             $table->enum('category', ['ppg', 'bcks', 'pkgbk', 'pkgsd mbi', 'stem' ,'pm/kka', 'ukkj', 'gpk mahir']);
             $table->text('question');
             $table->text('answer')->nullable();
-            $table->foreignId('user_id')->nullable()->constrained('users')->cascadeOnDelete();
+            $table->foreignUuid('user_id')->nullable()->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });
     }
