@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('instansi');
             $table->bigInteger('phone');
             $table->string('email');
-            $table->enum('category', ['ppg', 'bcks', 'pkgbk', 'pkgsd mbi', 'stem' ,'pm/kka', 'ukkj', 'gpk mahir']);
+            $table->enum('category', ['ppg', 'bcks','bcps', 'pkgbk', 'pkgsd mbi', 'stem' ,'pm/kka', 'ukkj', 'gpk mahir', 'sekolah model']);
             $table->text('question');
             $table->text('answer')->nullable();
             $table->foreignUuid('user_id')->nullable()->constrained('users')->cascadeOnDelete();

@@ -20,7 +20,7 @@ class QnaController extends Controller
             'phone' => 'required|numeric',
             'category' => [
                 'required',
-                Rule::in(['ppg', 'bcks', 'pkgbk', 'pkgsd mbi', 'stem', 'pm/kka', 'ukkj', 'gpk mahir']),
+                Rule::in(['ppg', 'bcks', 'pkgbk', 'pkgsd mbi', 'stem', 'pm/kka', 'ukkj', 'gpk mahir', 'bcps', 'sekolah model']),
             ],
             'question' => 'required|string',
         ]);

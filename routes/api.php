@@ -28,4 +28,8 @@ Route::prefix('v1')->group(function () {
     Route::get('/kemitraans', [LayananController::class, 'getKemitraans']);
 
     Route::post('/ask', [QnaController::class, 'ask']);
+
+    Route::get('/test', function() {
+    return response()->json(['message' => 'API Berhasil diakses']);
+});
 });
