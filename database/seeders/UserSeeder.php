@@ -13,16 +13,16 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::truncate();
+        $user = User::updateOrCreate(
+            ['username' => 'admin'],
+            [
+                'name' => 'Super Admin',
+                'email' => 'administrator@app.com',
+                'password' => Hash::make('oke'),
+            ]
+        );
 
-        $user = User::create([
-            'name' => 'Super Admin',
-            'username' => 'admin',
-            'email' => 'administrator@app.com',
-            'password' => Hash::make('oke')
-        ]);
-
-        $user->roles()->attach([1, 2]);
+        $user->roles()->syncWithoutDetaching([1, 2]);
 
         $userType = [
             2 => 'User',
@@ -31,14 +31,16 @@ class UserSeeder extends Seeder
         foreach ($userType as $key => $newUser) {
             $roleId = $key;
 
-            $user = User::create([
-                'name' => $newUser,
-                'username' => strtolower($newUser),
-                'email' => strtolower($newUser) . '@app.com',
-                'password' => Hash::make('eskelapa'),
-            ]);
+            $user = User::updateOrCreate(
+                ['username' => strtolower($newUser)],
+                [
+                    'name' => $newUser,
+                    'email' => strtolower($newUser) . '@app.com',
+                    'password' => Hash::make('eskelapa'),
+                ]
+            );
 
-            $user->roles()->attach($roleId);
+            $user->roles()->syncWithoutDetaching([$roleId]);
         }
     }
 }
