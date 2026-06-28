@@ -23,4 +23,14 @@ Route::prefix('qna')->group(function () {
     Route::middleware(['rbac:qna,4'])->group(function () {
         Route::delete('/delete', [QnaController::class, 'delete'])->name('qna.delete');
     });
+
+
+    Route::middleware(['rbac:qna,4'])->group(function () {
+            Route::get('/export', [QnaController::class, 'export'])->name('qna.export');
+            Route::get('/data-answered', [QnaController::class, 'datatableAnswered'])->name('qna.data.answered');
+
+    });
+
+
+    
 });

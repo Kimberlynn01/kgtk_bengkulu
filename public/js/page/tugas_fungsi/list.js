@@ -27,10 +27,9 @@ $(() => {
         ],
     });
 
-    // VALIDASI UKURAN FILE (2MB)
     $(document).on("change", 'input[type="file"]', function () {
-        if (this.files.length > 0 && this.files[0].size > 2 * 1024 * 1024) {
-            App.showToastr.error("File Terlalu Besar", "File melebihi 2MB.");
+        if (this.files.length > 0 && this.files[0].size > 20 * 1024 * 1024) {
+            App.showToastr.error("File Terlalu Besar", "File melebihi 20MB.");
             $(this).val("");
             return false;
         }

@@ -1,13 +1,15 @@
 let table;
+let answeredTable = null;
 
 $(() => {
-    // Inisialisasi DataTable
+
+    // ── DataTable Utama ──────────────────────────────────────────────
     table = $("#table-data").DataTable({
         language: App.options.dt,
         serverSide: true,
         processing: true,
         ajax: {
-            url: BASE_URL + "qna/data", // Menuju ke route rbac qna,1
+            url: BASE_URL + "qna/data",
             type: "get",
             dataType: "json",
         },
@@ -17,11 +19,10 @@ $(() => {
             { data: "instansi" },
             { data: "category" },
             { data: "question" },
-            {
-                data: "status",
-                searchable: false,
-                orderable: false,
-            },
+            { data: "answer_preview",  searchable: false, orderable: false },
+            { data: "asked_at",        searchable: false, orderable: false },
+            { data: "answered_at_col", searchable: false, orderable: false },
+            { data: "status",          searchable: false, orderable: false },
             {
                 data: "id",
                 searchable: false,
@@ -42,7 +43,38 @@ $(() => {
         ],
     });
 
-    // Menampilkan Modal Edit / Jawab
+    // ── Tombol "Jawaban" → buka modal + init/reload table ───────────
+    $(".btn-show-answered").on("click", function () {
+        $("#modal-answered").modal("show");
+
+        if (answeredTable === null) {
+            answeredTable = $("#table-answered").DataTable({
+                language: App.options.dt,
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: BASE_URL + "qna/data-answered",
+                    type: "get",
+                    dataType: "json",
+                },
+                columns: [
+                    { data: "DT_RowIndex", searchable: false, orderable: false },
+                    { data: "name" },
+                    { data: "instansi" },
+                    { data: "category" },
+                    { data: "question" },
+                    { data: "answer" },
+                    { data: "asked_at",        searchable: false, orderable: false },
+                    { data: "answered_at_col", searchable: false, orderable: false },
+                    { data: "admin_name",      searchable: false, orderable: false },
+                ],
+            });
+        } else {
+            answeredTable.ajax.reload();
+        }
+    });
+
+    // ── Tombol Edit / Jawab ──────────────────────────────────────────
     $("#table-data").on("click", ".btn-update", function () {
         let id = $(this).data("id");
         $.get(BASE_URL + "qna/edit/" + id, (res) => {
@@ -55,15 +87,14 @@ $(() => {
                 $("#show-category").text(res.category);
                 $("#show-question").text(res.question);
                 $("#answer").val(res.answer);
-
                 $("#modal-qna").modal("show");
             }
-        }).fail((err) => {
+        }).fail(() => {
             App.showToastr.error("Error", "Gagal mengambil data pertanyaan");
         });
     });
 
-    // Form Submit (Update Jawaban)
+    // ── Submit Jawaban ───────────────────────────────────────────────
     $("#form-qna").on("submit", function (e) {
         e.preventDefault();
 
@@ -81,11 +112,7 @@ $(() => {
             },
             success: (res) => {
                 $("#modal-qna .modal-content").LoadingOverlay("hide");
-
-                App.showToastr.success(
-                    "Sukses",
-                    res.message || "Jawaban berhasil disimpan",
-                );
+                App.showToastr.success("Sukses", res.message || "Jawaban berhasil disimpan");
                 $("#modal-qna").modal("hide");
                 table.ajax.reload();
             },
@@ -100,7 +127,7 @@ $(() => {
         });
     });
 
-    // Proses Delete
+    // ── Hapus ────────────────────────────────────────────────────────
     $("#table-data").on("click", ".btn-delete", function () {
         let id = $(this).data("id");
         Swal.fire({
@@ -116,10 +143,7 @@ $(() => {
                     BASE_URL + "qna/delete",
                     { id: id, _method: "DELETE" },
                     (res) => {
-                        App.showToastr.success(
-                            "Sukses",
-                            res.message || "Data berhasil dihapus",
-                        );
+                        App.showToastr.success("Sukses", res.message || "Data berhasil dihapus");
                         table.ajax.reload();
                     },
                 ).fail((err) => {

@@ -30,12 +30,12 @@ $(() => {
     // VALIDASI UKURAN FILE (2MB)
     $(document).on("change", 'input[type="file"]', function () {
         const files = this.files;
-        const maxSize = 2 * 1024 * 1024; // 2MB
+        const maxSize = 20 * 1024 * 1024; // 2MB
         for (let i = 0; i < files.length; i++) {
             if (files[i].size > maxSize) {
                 App.showToastr.error(
                     "File Terlalu Besar",
-                    `File "${files[i].name}" melebihi 2MB.`,
+                    `File "${files[i].name}" melebihi 20MB.`,
                 );
                 $(this).val("");
                 return false;

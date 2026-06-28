@@ -19,6 +19,11 @@ class Qna extends Model
         'question',
         'answer',
         'user_id',
+        'answered_at',
+    ];
+
+    protected $casts = [
+        'answered_at' => 'datetime',
     ];
 
 
