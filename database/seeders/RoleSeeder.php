@@ -17,7 +17,7 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        $arr = ['Super Admin', 'User'];
+        $arr = ['Super Admin', 'User', 'PIC'];
 
         $allMenus = Menu::all()->pluck('id');
         $homeMenu = Menu::where('name', '=', 'Beranda')->first();
@@ -38,6 +38,21 @@ class RoleSeeder extends Seeder
                 foreach ($allMenus as $menu) {
                     foreach ($allActions as $action) {
                         $role->menus()->attach($menu, ['action_id' => $action]);
+                    }
+                }
+            } elseif ($key === 2) {
+                $qnaMenu = Menu::where('slug_name', 'qna')->first();
+                $allowedActions = Action::whereIn('id', [1, 3])->get()->pluck('id');
+
+                if ($homeMenu) {
+                    foreach ($allActions as $action) {
+                        $role->menus()->attach($homeMenu->id, ['action_id' => $action]);
+                    }
+                }
+
+                if ($qnaMenu) {
+                    foreach ($allowedActions as $action) {
+                        $role->menus()->attach($qnaMenu->id, ['action_id' => $action]);
                     }
                 }
             } else {

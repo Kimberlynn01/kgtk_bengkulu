@@ -18,6 +18,7 @@ Route::prefix('qna')->group(function () {
 
     Route::middleware(['rbac:qna,3'])->group(function () {
         Route::patch('/update', [QnaController::class, 'update'])->name('qna.update');
+        Route::post('/store-pic', [QnaController::class, 'storePic'])->name('qna.store-pic');
     });
 
     Route::middleware(['rbac:qna,4'])->group(function () {

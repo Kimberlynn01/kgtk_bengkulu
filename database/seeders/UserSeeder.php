@@ -22,10 +22,12 @@ class UserSeeder extends Seeder
             ]
         );
 
-        $user->roles()->syncWithoutDetaching([1, 2]);
+        $user->roles()->syncWithoutDetaching([1, 2,3]);
 
         $userType = [
             2 => 'User',
+            3 => 'PIC',
+            
         ];
 
         foreach ($userType as $key => $newUser) {
@@ -36,7 +38,7 @@ class UserSeeder extends Seeder
                 [
                     'name' => $newUser,
                     'email' => strtolower($newUser) . '@app.com',
-                    'password' => Hash::make('eskelapa'),
+                    'password' => Hash::make('oke'),
                 ]
             );
 

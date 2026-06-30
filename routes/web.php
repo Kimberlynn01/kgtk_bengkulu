@@ -24,6 +24,12 @@ Route::middleware('auth')->group(function () {
     require __DIR__ . '/panel/profil_kgtk.php';
     require __DIR__ . '/panel/layanan.php';
     require __DIR__ . '/panel/impersonate.php';
+    require __DIR__ . '/panel/data-sasaran.php';
+    require __DIR__ . '/panel/permohonan_narasumber.php';
+    require __DIR__ . '/panel/permohonan_sarana_prasarana.php';
+    require __DIR__ . '/panel/permohonan-informasi.php';
+    require __DIR__ . '/panel/permohonan-kerja-sama.php';
+    require __DIR__ . '/panel/struktur-organisasi.php';
 });
 
 

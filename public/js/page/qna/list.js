@@ -1,8 +1,43 @@
 let table;
 let answeredTable = null;
 
+
 $(() => {
 
+    $(document).on("submit", "#form-user-pic", function (e) {
+        e.preventDefault(); 
+        e.stopPropagation();
+
+        const form = $(this);
+
+        $.ajax({
+            url: BASE_URL + "qna/store-pic", // Pastikan route ini sesuai di web.php Anda
+            type: "POST",
+            data: form.serialize(),
+            beforeSend: () => {
+                $("#modal-user-pic .modal-content").LoadingOverlay("show");
+                form.find("button[type='submit']").attr("disabled", true);
+            },
+            success: (res) => {
+                $("#modal-user-pic .modal-content").LoadingOverlay("hide");
+                App.showToastr.success("Sukses", res.message || "User PIC berhasil ditambahkan!");
+                $("#modal-user-pic").modal("hide");
+                form[0].reset();
+                if (typeof table !== "undefined") table.ajax.reload();
+            },
+            error: (err) => {
+                $("#modal-user-pic .modal-content").LoadingOverlay("hide");
+                if (err.status === 422) {
+                    App.handleErrors.generate(err.responseJSON);
+                } else {
+                    App.showToastr.error("Error", err.responseJSON?.message || "Gagal menyimpan data");
+                }
+            },
+            complete: () => {
+                form.find("button[type='submit']").attr("disabled", false);
+            },
+        });
+    });
     // ── DataTable Utama ──────────────────────────────────────────────
     table = $("#table-data").DataTable({
         language: App.options.dt,
@@ -33,6 +68,7 @@ $(() => {
                             <button class="btn btn-primary btn-update" data-id="${data}" title="Jawab Pertanyaan">
                                 <i class="icofont icofont-ui-edit"></i>
                             </button>
+                            
                             <button class="btn btn-danger btn-delete" data-id="${data}" title="Hapus">
                                 <i class="icofont icofont-trash"></i>
                             </button>
@@ -84,7 +120,8 @@ $(() => {
                 $("#show-email").text(res.email);
                 $("#show-instansi").text(res.instansi);
                 $("#show-phone").text(res.phone);
-                $("#show-category").text(res.category);
+                $("#show-category").val(res.category);
+                $("#input-category").val(res.category);
                 $("#show-question").text(res.question);
                 $("#answer").val(res.answer);
                 $("#modal-qna").modal("show");
@@ -126,6 +163,57 @@ $(() => {
             },
         });
     });
+
+    // ── Edit Kategori ─────────────────────────────────────────────────────
+    $("#table-data").on("click", ".btn-edit-category", function () {
+        let id       = $(this).data("id");
+        let name     = $(this).data("name");
+        let question = $(this).data("question");
+        let category = $(this).data("category");
+
+        $("#category-id").val(id);
+        $("#category-show-name").text(name);
+        $("#category-show-question").text(question);
+        $("#category-select").val(category);
+        $("#modal-edit-category").modal("show");
+    });
+
+    $("#form-edit-category").on("submit", function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: BASE_URL + "qna/update-category",
+            type: "POST",
+            data: new FormData(this),
+            processData: false,
+            contentType: false,
+            beforeSend: () => {
+                $("#modal-edit-category .modal-content").LoadingOverlay("show");
+                $("#form-edit-category button[type='submit']").attr("disabled", true);
+            },
+            success: (res) => {
+                App.showToastr.success("sukses", res.message);
+                $("#modal-edit-category").modal("hide");
+                table.ajax.reload();
+            },
+            error: ({ status, responseJSON }) => {
+                if (status == 422) {
+                    App.handleErrors.generate(responseJSON);
+                    return false;
+                }
+                if (status == 403) {
+                    App.showToastr.error("oops", "Akses ditolak.");
+                    return false;
+                }
+                App.showToastr.error("oops", responseJSON.message);
+            },
+            complete: () => {
+                $("#modal-edit-category .modal-content").LoadingOverlay("hide");
+                $("#form-edit-category button[type='submit']").attr("disabled", false);
+            },
+        });
+    });
+    
 
     // ── Hapus ────────────────────────────────────────────────────────
     $("#table-data").on("click", ".btn-delete", function () {

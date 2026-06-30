@@ -72,6 +72,7 @@ class MenuSeeder extends Seeder
             ['Tim Kerja', 'tim_kerja', 'tim_kerja', 'icofont-users-alt-2'],
             ['Janji & Maklumat Layanan', 'janji_maklumat', 'janji_maklumat', 'icofont-certificate-alt-1'],
             ['Profil Pejabat Struktural', 'profil_pejabat', 'profil_pejabat', 'icofont-users-social'],
+            ['Struktur Organisasi', 'struktur_organisasi', 'struktur_organisasi', 'icofont-network'],
         ];
 
         foreach ($profil as $index => $m) {
@@ -90,6 +91,10 @@ class MenuSeeder extends Seeder
             ['Informasi & Program', 'informasi_program', 'informasi_program', 'icofont-info-square'],
             ['Kemitraan', 'kemitraan', 'kemitraan', 'icofont-handshake-deal'],
             ['QnA', 'qna', 'qna', 'icofont-chat'],
+            ['Permohonan Informasi',                       'permohonan_informasi',        'permohonan_informasi',        'icofont-file-document'],
+            ['Permohonan Kerja Sama',                      'permohonan_kerja_sama',       'permohonan_kerja_sama',       'icofont-handshake-deal'],
+            ['Permohonan Narasumber',                      'permohonan_narasumber',       'permohonan_narasumber',       'icofont-microphone-alt'],
+            ['Permohonan Pemanfaatan Sarana & Prasarana',  'permohonan_sarana_prasarana', 'permohonan_sarana_prasarana', 'icofont-building-alt'],
         ];
 
         foreach ($layanan as $index => $m) {
@@ -109,6 +114,7 @@ class MenuSeeder extends Seeder
             ['Berita', 'berita', 'berita', 'icofont-news'],
             ['Survey Kepuasan (SKM)', 'skm', 'skm', 'icofont-listing-box'],
             ['Hasil Survey SKM', 'hasil_survey', 'hasil_survey', 'icofont-chart-histogram-alt'],
+            ['Data Sasaran', 'data_sasaran', 'data_sasaran', 'icofont-focus'],
         ];
 
         foreach ($publikasi as $index => $m) {

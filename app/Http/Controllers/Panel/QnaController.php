@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Panel;
 
 use App\Models\Qna;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Yajra\DataTables\Facades\DataTables;
@@ -15,19 +17,16 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use App\Http\Requests\Panel\QnA\QnaStoreRequest;
+use App\Http\Requests\Panel\QnA\QnaUpdateRequest;
+use App\Http\Requests\Panel\QnA\UserPicStoreRequest;
+use Illuminate\Support\Facades\DB;
 
 class QnaController extends Controller
 {
-    public function store(Request $request)
+    public function store(QnaStoreRequest $request)
     {
-        $validated = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|max:255',
-            'instansi' => 'required|string|max:255',
-            'phone'    => 'required|numeric',
-            'category' => ['required', Rule::in(['ppg','bcks','bcps','pkgbk','pkgsd mbi','stem','pm/kka','ukkj','gpk mahir'])],
-            'question' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
         Qna::create($validated);
 
@@ -57,8 +56,8 @@ class QnaController extends Controller
                 if (!$row->answer) {
                     return '<span class="text-muted fst-italic small">Belum dijawab</span>';
                 }
-                return '<span class="d-inline-block text-truncate" style="max-width:200px;" 
-                              title="' . e($row->answer) . '">'
+                return '<span class="d-inline-block text-truncate" style="max-width:200px;"
+                            title="' . e($row->answer) . '">'
                             . \Str::limit($row->answer, 60)
                         . '</span>';
             })
@@ -72,11 +71,13 @@ class QnaController extends Controller
                 return '<span class="small">' . $row->answered_at->format('d/m/Y') . '<br><span class="text-muted">' . $row->answered_at->format('H:i') . '</span></span>';
             })
             ->addColumn('action', function ($row) {
-                $btn  = '<button class="btn btn-primary btn-sm btn-edit" data-id="' . $row->id . '"><i class="fa fa-pencil"></i> Jawab</button> ';
-                $btn .= '<button class="btn btn-danger btn-sm btn-delete" data-id="' . $row->id . '"><i class="fa fa-trash"></i> Hapus</button>';
+                $btn  = '<div class="btn-group">';
+                $btn .= '<button class="btn btn-primary btn-sm btn-update" data-id="' . $row->id . '" title="Jawab Pertanyaan"><i class="icofont icofont-ui-edit"></i></button>';
+                $btn .= '<button class="btn btn-danger btn-sm btn-delete" data-id="' . $row->id . '" title="Hapus"><i class="icofont icofont-trash"></i></button>';
+                $btn .= '</div>';
                 return $btn;
             })
-            ->rawColumns(['status', 'answer_preview', 'asked_at', 'answered_at_col', 'action'])
+            ->rawColumns(['category_btn', 'status', 'answer_preview', 'asked_at', 'answered_at_col', 'action'])
             ->make(true);
     }
 
@@ -85,28 +86,32 @@ class QnaController extends Controller
         return response()->json(Qna::findOrFail($id));
     }
 
-    public function update(Request $request)
+    public function update(QnaUpdateRequest $request)
     {
-        $request->validate([
-            'id'     => 'required|exists:qnas,id',
-            'answer' => 'required',
-        ]);
+        $request->validated();
 
         $qna = Qna::findOrFail($request->id);
+        $isAnswerChanged = $request->filled('answer') && ($qna->answer !== $request->answer);
+
         $qna->update([
             'answer'      => $request->answer,
+            'category'    => $request->category,
             'user_id'     => auth()->id(),
-            'answered_at' => now(),      // ← catat waktu dijawab
+            'answered_at' => now(),
         ]);
 
-        try {
-            Mail::to($qna->email)->send(new QnaAnsweredMail($qna));
-        } catch (\Exception $e) {
-            \Log::error('Gagal mengirim email QnA: ' . $e->getMessage());
+        if ($isAnswerChanged) {
+            try {
+                Mail::to($qna->email)->send(new QnaAnsweredMail($qna));
+            } catch (\Exception $e) {
+                \Log::error('Gagal mengirim email QnA: ' . $e->getMessage());
+            }
         }
 
         return response()->json(['message' => 'Jawaban berhasil disimpan dan email telah dikirim!']);
     }
+
+    
 
     public function delete(Request $request)
     {
@@ -129,7 +134,7 @@ class QnaController extends Controller
         $headers = [
             'No', 'Nama Penanya', 'Email', 'Instansi', 'No. HP',
             'Kategori', 'Pertanyaan', 'Jawaban', 'Status',
-            'Waktu Bertanya', 'Waktu Dijawab', 'Dijawab Oleh',
+            'Waktu Bertanya', 'Waktu Dijawab', 'Nama PIC',
         ];
 
         foreach ($headers as $i => $h) {
@@ -244,32 +249,71 @@ class QnaController extends Controller
     }
 
     public function datatableAnswered()
-{
-    $data = Qna::with('admin')
-        ->whereNotNull('answer')
-        ->latest('updated_at')
-        ->get();
+    {
+        $data = Qna::with('admin')
+            ->whereNotNull('answer')
+            ->latest('updated_at')
+            ->get();
 
-    return DataTables::of($data)
-        ->addIndexColumn()
-        ->addColumn('asked_at', function ($row) {
-            return '<span class="small">'
-                . $row->created_at->format('d/m/Y')
-                . '<br><span class="text-muted">'
-                . $row->created_at->format('H:i')
-                . '</span></span>';
-        })
-        ->addColumn('answered_at_col', function ($row) {
-            return '<span class="small">'
-                . $row->updated_at->format('d/m/Y')
-                . '<br><span class="text-muted">'
-                . $row->updated_at->format('H:i')
-                . '</span></span>';
-        })
-        ->addColumn('admin_name', function ($row) {
-            return optional($row->admin)->name ?? '-';
-        })
-        ->rawColumns(['asked_at', 'answered_at_col'])
-        ->make(true);
-}
+        return DataTables::of($data)
+            ->addIndexColumn()
+            ->addColumn('asked_at', function ($row) {
+                return '<span class="small">'
+                    . $row->created_at->format('d/m/Y')
+                    . '<br><span class="text-muted">'
+                    . $row->created_at->format('H:i')
+                    . '</span></span>';
+            })
+            ->addColumn('answered_at_col', function ($row) {
+                return '<span class="small">'
+                    . $row->updated_at->format('d/m/Y')
+                    . '<br><span class="text-muted">'
+                    . $row->updated_at->format('H:i')
+                    . '</span></span>';
+            })
+            ->addColumn('admin_name', function ($row) {
+                return optional($row->admin)->name ?? '-';
+            })
+            ->rawColumns(['asked_at', 'answered_at_col'])
+            ->make(true);
+    }
+
+    public function storePic(UserPicStoreRequest $request)
+    {
+        $validated = $request->validated();
+
+        $role = Role::where('name', 'PIC')->first();
+
+        if (!$role) {
+            return response()->json([
+                'message' => 'Role "PIC" tidak ditemukan di sistem. Silakan buat role tersebut terlebih dahulu.',
+            ], 422);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $user = User::create([
+                'name'      => $validated['name'],
+                'username'  => $validated['username'],
+                'email'     => $validated['email'],
+                'password'  => $validated['password'],
+                'is_active' => 1,
+            ]);
+
+            $user->roles()->attach($role->id);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Gagal menambahkan user PIC: ' . $e->getMessage());
+
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage(),
+            ], 500);
+        }
+
+        return response()->json(['message' => 'User PIC berhasil ditambahkan!']);
+    }
+
 }
