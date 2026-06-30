@@ -24,4 +24,5 @@ config/audit.php
 
 **/*.DS_Store
 .DS_Store
-.sql
+dump.sql
+dump_qnas.sql
