@@ -24,3 +24,4 @@ config/audit.php
 
 **/*.DS_Store
 .DS_Store
+.sql
