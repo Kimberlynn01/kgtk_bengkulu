@@ -297,7 +297,7 @@ class QnaController extends Controller
                 'name'      => $validated['name'],
                 'username'  => $validated['username'],
                 'email'     => $validated['email'],
-                'password'  => $validated['password'],
+                'password'  => bcrypt($validated['password']),
                 'is_active' => 1,
             ]);
 

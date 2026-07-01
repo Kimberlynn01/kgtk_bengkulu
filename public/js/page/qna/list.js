@@ -4,40 +4,75 @@ let answeredTable = null;
 
 $(() => {
 
-    $(document).on("submit", "#form-user-pic", function (e) {
-        e.preventDefault(); 
-        e.stopPropagation();
+   $(document).on("submit", "#form-user-pic", function (e) {
+    e.preventDefault(); 
+    e.stopPropagation();
 
-        const form = $(this);
+    const form = $(this);
 
-        $.ajax({
-            url: BASE_URL + "qna/store-pic", // Pastikan route ini sesuai di web.php Anda
-            type: "POST",
-            data: form.serialize(),
-            beforeSend: () => {
-                $("#modal-user-pic .modal-content").LoadingOverlay("show");
-                form.find("button[type='submit']").attr("disabled", true);
-            },
-            success: (res) => {
-                $("#modal-user-pic .modal-content").LoadingOverlay("hide");
-                App.showToastr.success("Sukses", res.message || "User PIC berhasil ditambahkan!");
-                $("#modal-user-pic").modal("hide");
-                form[0].reset();
-                if (typeof table !== "undefined") table.ajax.reload();
-            },
-            error: (err) => {
-                $("#modal-user-pic .modal-content").LoadingOverlay("hide");
-                if (err.status === 422) {
-                    App.handleErrors.generate(err.responseJSON);
+    $.ajax({
+        url: BASE_URL + "qna/store-pic", 
+        type: "POST",
+        data: form.serialize(),
+        beforeSend: () => {
+            // 1. Bersihkan error lama sebelum submit ulang agar tidak menumpuk
+            if (window.App && App.handleErrors && typeof App.handleErrors.clear === "function") {
+                App.handleErrors.clear(form);
+            }
+            $("#modal-user-pic .modal-content").LoadingOverlay("show");
+            form.find("button[type='submit']").attr("disabled", true);
+        },
+        success: (res) => {
+            $("#modal-user-pic .modal-content").LoadingOverlay("hide");
+            App.showToastr.success("Sukses", res.message || "User PIC berhasil ditambahkan!");
+            $("#modal-user-pic").modal("hide");
+            form[0].reset();
+            if (typeof table !== "undefined") table.ajax.reload();
+        },
+        error: (err) => {
+    $("#modal-user-pic .modal-content").LoadingOverlay("hide");
+    
+    if (err.status === 422) {
+        // Ambil data error response
+        let errorData = err.responseJSON;
+
+        // JIKA responseJSON kosong, coba parse manual dari responseText
+        if (!errorData && err.responseText) {
+            try {
+                errorData = JSON.parse(err.responseText);
+            } catch (e) {
+                console.error("Gagal parse JSON manual:", e);
+            }
+        }
+
+        // Jalankan generator error jika data object-nya valid
+        if (errorData) {
+            // Coba kirim langsung object errorData, atau errorData.errors jika main.js butuh nested object-nya
+            try {
+                App.handleErrors.generate(errorData, true);
+            } catch (e) {
+                // Failsafe jika main.js masih nge-crush, kita paksa pakai toastr biar kelihatan errornya
+                console.error("App.handleErrors.generate gagal:", e);
+                if (errorData.errors) {
+                    let msg = Object.values(errorData.errors).map(el => el[0]).join("<br>");
+                    App.showToastr.error("Validasi Gagal", msg);
                 } else {
-                    App.showToastr.error("Error", err.responseJSON?.message || "Gagal menyimpan data");
+                    App.showToastr.error("Error", errorData.message || "Validasi gagal.");
                 }
-            },
-            complete: () => {
-                form.find("button[type='submit']").attr("disabled", false);
-            },
-        });
+            }
+        } else {
+            App.showToastr.error("Error", "Terjadi kesalahan validasi data.");
+        }
+
+    } else {
+        App.showToastr.error("Error", err.responseJSON?.message || "Gagal menyimpan data");
+    }
+},
+        complete: () => {
+            form.find("button[type='submit']").attr("disabled", false);
+        },
     });
+});
     // ── DataTable Utama ──────────────────────────────────────────────
     table = $("#table-data").DataTable({
         language: App.options.dt,

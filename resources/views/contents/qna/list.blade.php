@@ -140,35 +140,38 @@
         </form>
     </div>
 
-    <div id="modal-user-pic" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div id="modal-user-pic" class="modal fade" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="form-user-pic" method="POST" action="javascript:void(0);">
+            <form id="form-user-pic" method="POST" action="javascript:void(0);" autocomplete="off">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title">Tambah User PIC</h5>
                     <button class="btn-close" type="button" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
+                    <div class="form-group mb-3">
                         <label class="form-label">Nama</label>
                         <input type="text" name="name" id="pic-name" class="form-control" required>
-                        <div id="error-name"></div>
+                        <div id="error-name" class="invalid-feedback d-block"></div>
                     </div>
-                    <div class="mb-3">
+                    
+                    <div class="form-group mb-3">
                         <label class="form-label">Username</label>
                         <input type="text" name="username" id="pic-username" class="form-control" required>
-                        <div id="error-username"></div>
+                        <div id="error-username" class="invalid-feedback d-block"></div>
                     </div>
-                    <div class="mb-3">
+                    
+                    <div class="form-group mb-3">
                         <label class="form-label">Email</label>
                         <input type="email" name="email" id="pic-email" class="form-control" required>
-                        <div id="error-email"></div>
+                        <div id="error-email" class="invalid-feedback d-block"></div>
                     </div>
-                    <div class="mb-3">
+                    
+                    <div class="form-group mb-3">
                         <label class="form-label">Password</label>
                         <input type="password" name="password" id="pic-password" class="form-control" required>
-                        <div id="error-password"></div>
+                        <div id="error-password" class="invalid-feedback d-block"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
