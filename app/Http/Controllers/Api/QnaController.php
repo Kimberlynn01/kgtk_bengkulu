@@ -3,26 +3,34 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Qna;
+use App\Models\QnaCategory;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
 class QnaController extends Controller
 {
+    public function categories()
+    {
+        $categories = QnaCategory::where('is_active', true)
+            ->orderBy('sort_order')->orderBy('name')
+            ->get(['id', 'name']);
+
+        return response()->json([
+            'success' => true,
+            'data'    => $categories,
+        ]);
+    }
 
     public function ask(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'instansi' => 'required|string|max:255',
-            'phone' => 'required|numeric',
-            'category' => [
-                'required',
-                Rule::in(['ppg', 'bcks', 'pkgbk', 'pkgsd mbi', 'stem', 'pm/kka', 'ukkj', 'gpk mahir', 'bcps', 'sekolah model']),
-            ],
-            'question' => 'required|string',
+            'name'        => 'required|string|max:255',
+            'email'       => 'required|email|max:255',
+            'instansi'    => 'required|string|max:255',
+            'phone'       => 'required|numeric',
+            'category_id' => 'required|exists:qna_categories,id',
+            'question'    => 'required|string',
         ]);
 
         if ($validator->fails()) {

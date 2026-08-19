@@ -30,6 +30,8 @@ Route::middleware('auth')->group(function () {
     require __DIR__ . '/panel/permohonan-informasi.php';
     require __DIR__ . '/panel/permohonan-kerja-sama.php';
     require __DIR__ . '/panel/struktur-organisasi.php';
+    require __DIR__ . '/panel/profil-tambahan.php';
+    require __DIR__ . '/panel/program-peningkatan.php';
 });
 
 

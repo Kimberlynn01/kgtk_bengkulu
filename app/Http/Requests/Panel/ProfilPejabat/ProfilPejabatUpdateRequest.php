@@ -17,7 +17,7 @@ class ProfilPejabatUpdateRequest extends FormRequest
             'id' => 'required|exists:profil_pejabats,id',
             'title' => 'required|string|max:255',
             'images' => 'nullable|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg,heic|max:20480',
             'deleted_images' => 'nullable|array',
             'deleted_images.*' => 'exists:profil_pejabat_images,id',
         ];

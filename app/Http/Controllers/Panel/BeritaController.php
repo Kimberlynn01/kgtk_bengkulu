@@ -11,8 +11,8 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Str;
+use Yajra\DataTables\Facades\DataTables;
 
 class BeritaController extends Controller
 {
@@ -62,8 +62,9 @@ class BeritaController extends Controller
         try {
             return DB::transaction(function () use ($request) {
                 $berita = Berita::create([
-                    'date' => now(),
-                    'title' => $request->title,
+                    'date'    => $request->date ?? now(),
+                    'title'   => $request->title,
+                    'slug'    => Str::slug($request->title) . '-' . Str::random(5),
                     'content' => $request->content,
                 ]);
 
@@ -96,11 +97,15 @@ class BeritaController extends Controller
         try {
             return DB::transaction(function () use ($request) {
                 $berita = Berita::findOrFail($request->id);
+                
                 $berita->update([
-                    'title' => $request->title,
+                    'date'    => $request->date ?? $berita->date,
+                    'title'   => $request->title,
+                    'slug'    => Str::slug($request->title) . '-' . Str::random(5),
                     'content' => $request->content,
                 ]);
 
+                // Hapus gambar yang dicentang
                 if ($request->filled('deleted_images')) {
                     foreach ($request->deleted_images as $imageId) {
                         $image = BeritaImage::find($imageId);
@@ -111,6 +116,7 @@ class BeritaController extends Controller
                     }
                 }
 
+                // Upload gambar baru
                 if ($request->hasFile('images')) {
                     foreach ($request->file('images') as $image) {
                         $path = $image->store('beritas', 'public');
@@ -130,9 +136,11 @@ class BeritaController extends Controller
         try {
             return DB::transaction(function () use ($request) {
                 $berita = Berita::with('images')->findOrFail($request->id);
+                
                 foreach ($berita->images as $image) {
                     Storage::disk('public')->delete($image->image);
                 }
+                
                 $berita->delete();
                 return response()->json(['status' => true, 'message' => 'Berita berhasil dihapus'], 200);
             });

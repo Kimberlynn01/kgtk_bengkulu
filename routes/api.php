@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\PermohonanInformasiController;
 use App\Http\Controllers\Api\PermohonanKerjaSamaController;
 use App\Http\Controllers\Api\PermohonanNarasumberController;
 use App\Http\Controllers\Api\PermohonanSaranaPrasaranaController;
+use App\Http\Controllers\Api\ProgramPeningkatanController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -27,9 +28,24 @@ Route::prefix('v1')->group(function () {
     Route::get('/tim-kerja', [ProfilController::class, 'getTimKerja']);
     Route::get('/janji-maklumat', [ProfilController::class, 'getJanjiMaklumat']);
     Route::get('/profil-pejabat', [ProfilController::class, 'getProfilPejabat']);
+    Route::get('/sejarah', [ProfilController::class, 'getSejarahs']);
+    Route::get('/sejarah/{id}', [ProfilController::class, 'getSejarah']);
+    Route::get('/perilaku-core-value', [ProfilController::class, 'getPerilakuCoreValues']);
+    Route::get('/perilaku-core-value/{id}', [ProfilController::class, 'getPerilakuCoreValue']);
+    Route::get('/rencana-strategis', [ProfilController::class, 'getRencanaStrategis']);
+    Route::get('/rencana-strategis/{id}', [ProfilController::class, 'getRencanaStrategisDetail']);
+    Route::get('/perjanjian-kerja', [ProfilController::class, 'getPerjanjianKerja']);
+    Route::get('/perjanjian-kerja/{id}', [ProfilController::class, 'getPerjanjianKerjaDetail']);
+    Route::get('/laporan-kerja', [ProfilController::class, 'getLaporanKerja']);
+    Route::get('/laporan-kerja/{id}', [ProfilController::class, 'getLaporanKerjaDetail']);
 
     // Layanan
     Route::get('/informasi-programs', [LayananController::class, 'getInformasiPrograms']);
+    Route::get('/program-peningkatan', [ProgramPeningkatanController::class, 'getAll']);
+    Route::get('/peningkatan-guru', [ProgramPeningkatanController::class, 'getPeningkatanGuru']);
+    Route::get('/peningkatan-kompetensi-kepala-sekolah', [ProgramPeningkatanController::class, 'getPeningkatanKompetensiKepalaSekolah']);
+    Route::get('/peningkatan-kompetensi-pengawas-sekolah', [ProgramPeningkatanController::class, 'getPeningkatanKompetensiPengawasSekolah']);
+    Route::get('/peningkatan-kompetensi-tenaga-pendidikan', [ProgramPeningkatanController::class, 'getPeningkatanKompetensiTenagaPendidikan']);
     Route::get('/kemitraans', [LayananController::class, 'getKemitraans']);
 
     // Struktur Organisasi
@@ -47,6 +63,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/permohonan-sarana-prasarana', [PermohonanSaranaPrasaranaController::class, 'index']);
 
     // QnA
+    Route::get('/qna/categories', [QnaController::class, 'categories']);
     Route::post('/ask', [QnaController::class, 'ask']);
 
     // Test

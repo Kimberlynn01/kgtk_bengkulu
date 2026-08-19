@@ -16,7 +16,7 @@ class InformasiProgramStoreRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'files' => 'required|array|min:1',
-            'files.*' => 'required|file|mimes:jpeg,png,jpg,pdf,xls,xlsx|max:2048',
+            'files.*' => 'required|file|mimes:jpeg,png,jpg,pdf,xls,xlsx|max:20480',
         ];
     }
 }

@@ -17,7 +17,7 @@ class ArtikelStoreRequest extends FormRequest
             'title' => 'required|string|max:255',
             'content' => 'required',
             'images' => 'required|array|min:1',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:20480',
         ];
     }
 }

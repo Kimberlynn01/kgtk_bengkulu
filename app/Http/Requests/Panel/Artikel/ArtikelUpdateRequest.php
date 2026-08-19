@@ -18,7 +18,7 @@ class ArtikelUpdateRequest extends FormRequest
             'title' => 'required|string|max:255',
             'content' => 'required',
             'images' => 'nullable|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:20480',
             'deleted_images' => 'nullable|array',
             'deleted_images.*' => 'exists:artikel_images,id',
         ];

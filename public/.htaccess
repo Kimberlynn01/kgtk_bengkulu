@@ -4,6 +4,7 @@
     </IfModule>
 
     RewriteEngine On
+    LimitRequestBody 67108864
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .

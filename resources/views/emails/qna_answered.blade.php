@@ -1,7 +1,7 @@
 @component('mail::message')
 Jawaban Pertanyaan Q&A
 Halo {{ $qna->name }},
-Terima kasih telah menghubungi kami. Pertanyaan Anda mengenai kategori {{ strtoupper($qna->category) }} telah
+Terima kasih telah menghubungi kami. Pertanyaan Anda mengenai kategori {{ strtoupper(optional($qna->category)->name ?? '-') }} telah
 dijawab oleh admin kami.
 @component('mail::panel')
 Pertanyaan Anda:
@@ -9,7 +9,7 @@ Pertanyaan Anda:
 @endcomponent
 Jawaban Kami:
 {{ $qna->answer }}
-@component('mail::button', ['url' => config('app.url'), 'color' => 'primary'])
+@component('mail::button', ['url' => 'https://kgtkbengkulu.kemendikdasmen.go.id/', 'color' => 'primary'])
 Kunjungi Website
 @endcomponent
 Jika Anda memiliki pertanyaan lebih lanjut, jangan ragu untuk membalas email ini atau membuat tiket pertanyaan baru di

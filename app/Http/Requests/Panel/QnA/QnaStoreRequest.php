@@ -9,7 +9,7 @@ class QnaStoreRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // Set true agar request diizinkan lolos ke proses validasi
+        return true;
     }
 
     public function rules(): array
@@ -19,7 +19,7 @@ class QnaStoreRequest extends FormRequest
             'email'    => 'required|email|max:255',
             'instansi' => 'required|string|max:255',
             'phone'    => 'required|numeric',
-            'category' => ['required', Rule::in(['ppg', 'bcks', 'bcps', 'pkgbk', 'pkgsd mbi', 'stem', 'pm/kka', 'ukkj', 'gpk mahir'])],
+            'category_id' => 'required|exists:qna_categories,id',
             'question' => 'required|string',
         ];
     }
@@ -33,9 +33,9 @@ class QnaStoreRequest extends FormRequest
             'instansi.required' => 'Instansi wajib diisi.',
             'phone.required'    => 'No. Telepon wajib diisi.',
             'phone.numeric'     => 'No. Telepon harus berupa angka.',
-            'category.required' => 'Kategori wajib dipilih.',
-            'category.in'       => 'Kategori yang dipilih tidak valid.',
             'question.required' => 'Isi pertanyaan wajib diisi.',
+            'category_id.required' => 'Kategori wajib dipilih.',
+            'category_id.exists'   => 'Kategori tidak valid.',
         ];
     }
 }

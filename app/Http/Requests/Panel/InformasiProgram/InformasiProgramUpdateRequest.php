@@ -17,7 +17,7 @@ class InformasiProgramUpdateRequest extends FormRequest
             'id' => 'required|exists:informasi_programs,id',
             'title' => 'required|string|max:255',
             'files' => 'nullable|array',
-            'files.*' => 'file|mimes:jpeg,png,jpg,pdf,xls,xlsx|max:2048',
+            'files.*' => 'file|mimes:jpeg,png,jpg,pdf,xls,xlsx|max:20480',
             'deleted_files' => 'nullable|array',
             'deleted_files.*' => 'exists:informasi_program_files,id',
         ];

@@ -15,7 +15,7 @@ class Qna extends Model
         'email',
         'instansi',
         'phone',
-        'category',
+        'category_id',
         'question',
         'answer',
         'user_id',
@@ -30,5 +30,10 @@ class Qna extends Model
     public function admin() : BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(QnaCategory::class, 'category_id');
     }
 }

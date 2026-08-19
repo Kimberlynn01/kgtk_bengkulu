@@ -11,7 +11,7 @@ class StrukturOrganisasiStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:20480',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,heic|max:20480',
         ];
     }
 }

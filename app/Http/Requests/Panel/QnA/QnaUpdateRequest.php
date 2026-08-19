@@ -17,7 +17,7 @@ class QnaUpdateRequest extends FormRequest
         return [
             'id'       => 'required|exists:qnas,id',
             'answer'   => 'sometimes|required',
-            'category' => ['sometimes', 'required', Rule::in(['ppg', 'bcks', 'bcps', 'pkgbk', 'pkgsd mbi', 'stem', 'pm/kka', 'ukkj', 'gpk mahir'])],
+            'category_id' => 'required|exists:qna_categories,id',
         ];
     }
 
@@ -27,8 +27,8 @@ class QnaUpdateRequest extends FormRequest
             'id.required'       => 'ID QnA wajib disertakan.',
             'id.exists'         => 'Data QnA tidak ditemukan.',
             'answer.required'   => 'Jawaban resmi wajib diisi.',
-            'category.required' => 'Kategori wajib dipilih.',
-            'category.in'       => 'Kategori tidak valid.',
+            'category_id.required' => 'Kategori wajib dipilih.',
+            'category_id.exists'   => 'Kategori tidak valid.',
         ];
     }
 }

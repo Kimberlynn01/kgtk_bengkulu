@@ -10,6 +10,15 @@
         <div class="col-sm-12 text-right mb-2">
             <div class="bookmark">
                 <ul class="list-unstyled m-0 d-flex justify-content-end gap-2">
+                    @if (rbacCheck('qna', 1))
+                    <li>
+                        <a href="{{ route('qna-category') }}" class="btn btn-secondary btn-sm d-inline-flex align-items-center px-3" style="height: 34px; border-radius: 6px; font-weight: 500; font-size: 13px; gap: 8px;">
+                            <i data-feather="tag" style="width: 16px; height: 16px;"></i>
+                            <span>Kelola Kategori</span>
+                        </a>
+                    </li>
+                    @endif
+                    
                     @if (rbacCheck('qna', 4))
                     <li>
                         <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modal-user-pic">
@@ -99,17 +108,11 @@
                             </div>
                             <div class="col-md-12 mb-2">
                             <label class="fw-bold">Kategori:</label>
-                            <select name="category" id="show-category" class="form-control form-control-sm">
+                            <select name="category_id" id="show-category" class="form-control form-control-sm">
                                 <option value="">-- Pilih Kategori --</option>
-                                <option value="ppg">PPG</option>
-                                <option value="bcks">BCKS</option>
-                                <option value="bcps">BCPS</option>
-                                <option value="pkgbk">PKGBK</option>
-                                <option value="pkgsd mbi">PKGSD MBI</option>
-                                <option value="stem">STEM</option>
-                                <option value="pm/kka">PM/KKA</option>
-                                <option value="ukkj">UKKJ</option>
-                                <option value="gpk mahir">GPK Mahir</option>
+                                @foreach ($categories as $cat)
+                                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                @endforeach
                             </select>
                         </div>
                             <div class="col-12 mt-2">

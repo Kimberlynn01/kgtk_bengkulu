@@ -12,7 +12,7 @@ class StrukturOrganisasiUpdateRequest extends FormRequest
     {
         return [
             'id'    => 'required|exists:struktur_organisasis,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:20480',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,heic|max:20480',
         ];
     }
 }

@@ -16,7 +16,7 @@ class ProfilPejabatStoreRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'images' => 'required|array|min:1',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg,heic|max:20480',
         ];
     }
 }

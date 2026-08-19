@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Panel;
 
 use App\Models\Qna;
+use App\Models\QnaCategory;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Validation\Rule;
 use App\Mail\QnaAnsweredMail;
 use Illuminate\Support\Facades\Mail;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -38,15 +38,20 @@ class QnaController extends Controller
         return view('contents.qna.list', [
             'title'      => 'Manajemen QnA',
             'activeSlug' => 'qna',
+            'categories' => QnaCategory::where('is_active', true)
+                                ->orderBy('sort_order')->orderBy('name')->get(),
         ]);
     }
 
     public function datatable()
     {
-        $data = Qna::with('admin')->latest()->get();
+        $data = Qna::with(['admin', 'category'])->latest()->get();
 
         return DataTables::of($data)
             ->addIndexColumn()
+            ->addColumn('category_name', function ($row) {
+                return optional($row->category)->name ?? '-';
+            })
             ->addColumn('status', function ($row) {
                 return $row->answer
                     ? '<span class="badge bg-success">Terjawab</span>'
@@ -77,13 +82,13 @@ class QnaController extends Controller
                 $btn .= '</div>';
                 return $btn;
             })
-            ->rawColumns(['category_btn', 'status', 'answer_preview', 'asked_at', 'answered_at_col', 'action'])
+            ->rawColumns(['category_name', 'status', 'answer_preview', 'asked_at', 'answered_at_col', 'action'])
             ->make(true);
     }
 
     public function edit($id)
     {
-        return response()->json(Qna::findOrFail($id));
+        return response()->json(Qna::with('category')->findOrFail($id));
     }
 
     public function update(QnaUpdateRequest $request)
@@ -95,7 +100,7 @@ class QnaController extends Controller
 
         $qna->update([
             'answer'      => $request->answer,
-            'category'    => $request->category,
+            'category_id' => $request->category_id,
             'user_id'     => auth()->id(),
             'answered_at' => now(),
         ]);
@@ -111,8 +116,6 @@ class QnaController extends Controller
         return response()->json(['message' => 'Jawaban berhasil disimpan dan email telah dikirim!']);
     }
 
-    
-
     public function delete(Request $request)
     {
         Qna::findOrFail($request->id)->delete();
@@ -124,13 +127,12 @@ class QnaController extends Controller
     // ─────────────────────────────────────────────────────────────────
     public function export()
     {
-        $data = Qna::with('admin')->latest()->get();
+        $data = Qna::with(['admin', 'category'])->latest()->get();
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet()->setTitle('Data QnA');
         $sheet = $spreadsheet->getActiveSheet();
 
-        // ── Header ──────────────────────────────────────────────────
         $headers = [
             'No', 'Nama Penanya', 'Email', 'Instansi', 'No. HP',
             'Kategori', 'Pertanyaan', 'Jawaban', 'Status',
@@ -170,7 +172,6 @@ class QnaController extends Controller
         ]);
         $sheet->getRowDimension(1)->setRowHeight(32);
 
-        // ── Rows ─────────────────────────────────────────────────────
         foreach ($data as $i => $row) {
             $r      = $i + 2;
             $status = $row->answer ? 'Terjawab' : 'Pending';
@@ -180,7 +181,7 @@ class QnaController extends Controller
             $sheet->setCellValue("C{$r}", $row->email);
             $sheet->setCellValue("D{$r}", $row->instansi);
             $sheet->setCellValue("E{$r}", $row->phone);
-            $sheet->setCellValue("F{$r}", strtoupper($row->category));
+            $sheet->setCellValue("F{$r}", strtoupper(optional($row->category)->name ?? '-'));
             $sheet->setCellValue("G{$r}", $row->question);
             $sheet->setCellValue("H{$r}", $row->answer ?? '-');
             $sheet->setCellValue("I{$r}", $status);
@@ -188,7 +189,6 @@ class QnaController extends Controller
             $sheet->setCellValue("K{$r}", $row->answered_at ? $row->answered_at->format('d/m/Y H:i') : '-');
             $sheet->setCellValue("L{$r}", optional($row->admin)->name ?? '-');
 
-            // Alternating row color
             $bgColor = ($i % 2 === 0) ? 'EBF5FB' : 'FFFFFF';
 
             $sheet->getStyle("A{$r}:L{$r}")->applyFromArray([
@@ -200,7 +200,6 @@ class QnaController extends Controller
                 'alignment' => ['vertical' => Alignment::VERTICAL_TOP, 'wrapText' => true],
             ]);
 
-            // Warna status
             if ($row->answer) {
                 $sheet->getStyle("I{$r}")->applyFromArray([
                     'fill'      => ['fillType' => Fill::FILL_SOLID, 'color' => ['rgb' => 'D5F5E3']],
@@ -215,7 +214,6 @@ class QnaController extends Controller
                 ]);
             }
 
-            // Center: No, Kategori, Status, Waktu
             foreach (['A', 'F', 'J', 'K'] as $c) {
                 $sheet->getStyle("{$c}{$r}")->getAlignment()
                     ->setHorizontal(Alignment::HORIZONTAL_CENTER);
@@ -224,7 +222,6 @@ class QnaController extends Controller
             $sheet->getRowDimension($r)->setRowHeight(22);
         }
 
-        // ── Column widths ─────────────────────────────────────────────
         $widths = [
             'A' => 5,  'B' => 22, 'C' => 28, 'D' => 22,
             'E' => 14, 'F' => 12, 'G' => 38, 'H' => 42,
@@ -234,10 +231,8 @@ class QnaController extends Controller
             $sheet->getColumnDimension($col)->setWidth($w);
         }
 
-        // Freeze header row
         $sheet->freezePane('A2');
 
-        // ── Download ──────────────────────────────────────────────────
         $filename = 'QnA_Export_' . now()->format('Ymd_His') . '.xlsx';
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -250,13 +245,16 @@ class QnaController extends Controller
 
     public function datatableAnswered()
     {
-        $data = Qna::with('admin')
+        $data = Qna::with(['admin', 'category'])
             ->whereNotNull('answer')
             ->latest('updated_at')
             ->get();
 
         return DataTables::of($data)
             ->addIndexColumn()
+            ->addColumn('category_name', function ($row) {
+                return optional($row->category)->name ?? '-';
+            })
             ->addColumn('asked_at', function ($row) {
                 return '<span class="small">'
                     . $row->created_at->format('d/m/Y')
@@ -274,7 +272,7 @@ class QnaController extends Controller
             ->addColumn('admin_name', function ($row) {
                 return optional($row->admin)->name ?? '-';
             })
-            ->rawColumns(['asked_at', 'answered_at_col'])
+            ->rawColumns(['category_name', 'asked_at', 'answered_at_col'])
             ->make(true);
     }
 
@@ -315,5 +313,4 @@ class QnaController extends Controller
 
         return response()->json(['message' => 'User PIC berhasil ditambahkan!']);
     }
-
 }

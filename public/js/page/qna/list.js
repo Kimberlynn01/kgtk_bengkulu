@@ -87,7 +87,7 @@ $(() => {
             { data: "DT_RowIndex", searchable: false, orderable: false },
             { data: "name" },
             { data: "instansi" },
-            { data: "category" },
+            { data: "category_name" },
             { data: "question" },
             { data: "answer_preview",  searchable: false, orderable: false },
             { data: "asked_at",        searchable: false, orderable: false },
@@ -132,7 +132,7 @@ $(() => {
                     { data: "DT_RowIndex", searchable: false, orderable: false },
                     { data: "name" },
                     { data: "instansi" },
-                    { data: "category" },
+                    { data: "category_name" },
                     { data: "question" },
                     { data: "answer" },
                     { data: "asked_at",        searchable: false, orderable: false },
@@ -155,8 +155,7 @@ $(() => {
                 $("#show-email").text(res.email);
                 $("#show-instansi").text(res.instansi);
                 $("#show-phone").text(res.phone);
-                $("#show-category").val(res.category);
-                $("#input-category").val(res.category);
+                $("#show-category").val(res.category_id);
                 $("#show-question").text(res.question);
                 $("#answer").val(res.answer);
                 $("#modal-qna").modal("show");

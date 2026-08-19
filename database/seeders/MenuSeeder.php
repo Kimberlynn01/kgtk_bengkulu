@@ -73,6 +73,12 @@ class MenuSeeder extends Seeder
             ['Janji & Maklumat Layanan', 'janji_maklumat', 'janji_maklumat', 'icofont-certificate-alt-1'],
             ['Profil Pejabat Struktural', 'profil_pejabat', 'profil_pejabat', 'icofont-users-social'],
             ['Struktur Organisasi', 'struktur_organisasi', 'struktur_organisasi', 'icofont-network'],
+            ['Sejarah', 'sejarah', 'sejarah', 'icofont-history'],
+            ['Perilaku & Core Value', 'perilaku_core_value', 'perilaku-core-value', 'icofont-badge'],
+            ['Rencana Strategis', 'rencana_strategis', 'rencana-strategis', 'icofont-target-audience'],
+            ['Perjanjian Kerja', 'perjanjian_kerja', 'perjanjian-kerja', 'icofont-paper'],
+            ['Laporan Kerja', 'laporan_kerja', 'laporan-kerja', 'icofont-file-text'],
+
         ];
 
         foreach ($profil as $index => $m) {

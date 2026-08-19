@@ -18,7 +18,7 @@ class VisiMisiUpdateRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'required',
             'images' => 'nullable|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg,heic|max:20480',
             'deleted_images' => 'nullable|array',
             'deleted_images.*' => 'exists:visi_misi_images,id',
         ];

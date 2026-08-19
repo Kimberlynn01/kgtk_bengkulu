@@ -17,7 +17,7 @@ class TimKerjaStoreRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'nullable',
             'images' => 'required|array|min:1',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg,heic|max:20480',
         ];
     }
 }
