@@ -11,6 +11,9 @@ use App\Http\Controllers\Api\PermohonanKerjaSamaController;
 use App\Http\Controllers\Api\PermohonanNarasumberController;
 use App\Http\Controllers\Api\PermohonanSaranaPrasaranaController;
 use App\Http\Controllers\Api\ProgramPeningkatanController;
+use App\Http\Controllers\Api\NavbarMenuController;
+use App\Http\Controllers\Api\PtkController;
+use App\Http\Controllers\Api\ConsultationSessionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -70,6 +73,17 @@ Route::prefix('v1')->group(function () {
     Route::get('/test', function () {
         return response()->json(['message' => 'API Berhasil diakses']);
     });
+
+    // Navbar Fetch
+    Route::get('/navbar-menu', [NavbarMenuController::class, 'index']);
+
+    // Fetch PTK
+    Route::prefix('ptk')->group(function () {
+        Route::get('/fields', [PtkController::class, 'fields']);
+        Route::get('/recap', [PtkController::class, 'recap']);
+    });
+
+    Route::get('/consultation-session', [ConsultationSessionController::class, 'show']);
 
 
     Route::fallback(function () {

@@ -14,6 +14,7 @@ $(() => {
         columns: [
             { data: "DT_RowIndex", searchable: false, orderable: false },
             { data: "name" },
+            { data: "description", searchable: false, orderable: false },
             { data: "qnas_count", searchable: false, orderable: false },
             { data: "status", searchable: false, orderable: false },
             { data: "action", searchable: false, orderable: false },
@@ -29,13 +30,15 @@ $(() => {
     $("#table-category").on("click", ".btn-edit", function () {
         resetFormCategory();
 
-        let id     = $(this).data("id");
-        let name   = $(this).data("name");
-        let active = $(this).data("active");
+        let id          = $(this).data("id");
+        let name        = $(this).data("name");
+        let description = $(this).data("description");
+        let active      = $(this).data("active");
 
         $("#modal-categoryLabel").text("Edit Kategori");
         $("#category-id").val(id);
         $("#category-name").val(name);
+        $("#category-description").val(description);
         $("#category-is-active").prop("checked", active == 1);
 
         $("#modal-category").modal("show");
@@ -49,6 +52,7 @@ $(() => {
             App.handleErrors.clear($("#form-category"));
         }
         $("#error-name").text("");
+        $("#error-description").text("");
     }
 
     $("#form-category").on("submit", function (e) {

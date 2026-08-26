@@ -11,7 +11,7 @@ class QnaCategory extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'slug', 'is_active', 'sort_order'];
+    protected $fillable = ['name', 'description', 'slug', 'is_active', 'sort_order'];
 
     protected $casts = ['is_active' => 'boolean'];
 
@@ -25,5 +25,12 @@ class QnaCategory extends Model
     public function qnas(): HasMany
     {
         return $this->hasMany(Qna::class, 'category_id');
+    }
+
+    public function getFullLabelAttribute(): string
+    {
+        return $this->description
+            ? "{$this->name} - {$this->description}"
+            : $this->name;
     }
 }

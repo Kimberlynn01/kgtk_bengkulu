@@ -17,6 +17,12 @@
                             <span>Kelola Kategori</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('consultation-session') }}" class="btn btn-dark btn-sm text-light d-inline-flex align-items-center px-3" style="height: 34px; border-radius: 6px; font-weight: 500; font-size: 13px; gap: 8px;">
+                            <i data-feather="video" style="width:16px;height:16px;"></i>
+                            <span>Sesi Konsultasi</span>
+                        </a>
+                    </li>
                     @endif
                     
                     @if (rbacCheck('qna', 4))

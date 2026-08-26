@@ -14,11 +14,16 @@ class QnaController extends Controller
     {
         $categories = QnaCategory::where('is_active', true)
             ->orderBy('sort_order')->orderBy('name')
-            ->get(['id', 'name']);
+            ->get(['id', 'name', 'description']);
 
         return response()->json([
             'success' => true,
-            'data'    => $categories,
+            'data'    => $categories->map(fn ($c) => [
+                'id'          => $c->id,
+                'name'        => $c->name,
+                'description' => $c->description,
+                'label'       => $c->description ? "{$c->name} - {$c->description}" : $c->name,
+            ]),
         ]);
     }
 

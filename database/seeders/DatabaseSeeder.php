@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             ActionSeeder::class,
             RoleSeeder::class,
             UserSeeder::class,
+            PtkMenuSeeder::class,
         ]);
     }
 }

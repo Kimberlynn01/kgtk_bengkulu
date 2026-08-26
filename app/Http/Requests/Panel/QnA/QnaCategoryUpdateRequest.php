@@ -15,8 +15,9 @@ class QnaCategoryUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id'   => 'required|exists:qna_categories,id',
-            'name' => ['required', 'string', 'max:100', Rule::unique('qna_categories', 'name')->ignore($this->id)],
+            'id'          => 'required|exists:qna_categories,id',
+            'name'        => ['required', 'string', 'max:100', Rule::unique('qna_categories', 'name')->ignore($this->id)],
+            'description' => 'required|string|max:255',
         ];
     }
 
@@ -25,6 +26,8 @@ class QnaCategoryUpdateRequest extends FormRequest
         return [
             'name.required' => 'Nama kategori wajib diisi.',
             'name.unique'   => 'Nama kategori sudah ada.',
+            'description.required' => 'Deskripsi kategori wajib diisi.',
+            'description.max' => 'Deskripsi kategori tidak boleh lebih dari 255 karakter.',
         ];
     }
 }

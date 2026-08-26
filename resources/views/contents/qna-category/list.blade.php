@@ -42,9 +42,10 @@
                                 <tr>
                                     <th style="width: 5%;">#</th>
                                     <th>Nama Kategori</th>
-                                    <th style="width: 15%;">Jumlah QnA</th>
-                                    <th style="width: 12%;">Status</th>
-                                    <th style="width: 12%;">Aksi</th>
+                                    <th>Kepanjangan</th>
+                                    <th style="width: 12%;">Jumlah QnA</th>
+                                    <th style="width: 10%;">Status</th>
+                                    <th style="width: 10%;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -68,9 +69,15 @@
                         <input type="hidden" name="id" id="category-id">
 
                         <div class="form-group mb-3">
-                            <label class="form-label fw-bold" for="category-name">Nama Kategori</label>
+                            <label class="form-label fw-bold" for="category-name">Nama Kategori (Singkatan)</label>
                             <input type="text" name="name" id="category-name" class="form-control" placeholder="Contoh: PPG, BCKS, STEM, dst." required>
                             <div id="error-name" class="invalid-feedback d-block"></div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-bold" for="category-description">Kepanjangan</label>
+                            <input type="text" name="description" id="category-description" class="form-control" placeholder="Contoh: Pendidikan Profesi Guru">
+                            <div id="error-description" class="invalid-feedback d-block"></div>
                         </div>
 
                         <div class="form-check form-switch">

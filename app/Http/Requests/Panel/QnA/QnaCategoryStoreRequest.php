@@ -15,7 +15,8 @@ class QnaCategoryStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:100', Rule::unique('qna_categories', 'name')],
+            'name'        => ['required', 'string', 'max:100', Rule::unique('qna_categories', 'name')],
+            'description' => 'required|string|max:255',
         ];
     }
 
@@ -24,6 +25,9 @@ class QnaCategoryStoreRequest extends FormRequest
         return [
             'name.required' => 'Nama kategori wajib diisi.',
             'name.unique'   => 'Nama kategori sudah ada.',
+            'description.required' => 'Deskripsi kategori wajib diisi.',
+            'description.max' => 'Deskripsi kategori tidak boleh lebih dari 255 karakter.',
+            
         ];
     }
 }

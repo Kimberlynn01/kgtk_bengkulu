@@ -32,6 +32,10 @@ Route::middleware('auth')->group(function () {
     require __DIR__ . '/panel/struktur-organisasi.php';
     require __DIR__ . '/panel/profil-tambahan.php';
     require __DIR__ . '/panel/program-peningkatan.php';
+    require __DIR__ . '/panel/ptk.php';
+    require __DIR__ . '/panel/navbar.php';
+    require __DIR__ . '/panel/gmeet.php';
+
 });
 
 

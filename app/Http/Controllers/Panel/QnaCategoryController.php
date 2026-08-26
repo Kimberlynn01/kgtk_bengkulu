@@ -25,6 +25,9 @@ class QnaCategoryController extends Controller
 
         return DataTables::of($data)
             ->addIndexColumn()
+            ->addColumn('description', function ($row) {
+                return $row->description ?: '-';
+            })
             ->addColumn('status', function ($row) {
                 return $row->is_active
                     ? '<span class="badge bg-success">Aktif</span>'
@@ -32,7 +35,7 @@ class QnaCategoryController extends Controller
             })
             ->addColumn('action', function ($row) {
                 $btn  = '<div class="btn-group">';
-                $btn .= '<button class="btn btn-primary btn-sm btn-edit" data-id="' . $row->id . '" data-name="' . e($row->name) . '" data-active="' . (int) $row->is_active . '" title="Edit"><i class="icofont icofont-ui-edit"></i></button>';
+                $btn .= '<button class="btn btn-primary btn-sm btn-edit" data-id="' . $row->id . '" data-name="' . e($row->name) . '" data-description="' . e($row->description) . '" data-active="' . (int) $row->is_active . '" title="Edit"><i class="icofont icofont-ui-edit"></i></button>';
                 $btn .= '<button class="btn btn-danger btn-sm btn-delete" data-id="' . $row->id . '" title="Hapus"><i class="icofont icofont-trash"></i></button>';
                 $btn .= '</div>';
                 return $btn;
@@ -55,8 +58,9 @@ class QnaCategoryController extends Controller
         $validated = $request->validated();
 
         QnaCategory::findOrFail($validated['id'])->update([
-            'name'      => $validated['name'],
-            'is_active' => $request->boolean('is_active'),
+            'name'        => $validated['name'],
+            'description' => $validated['description'],
+            'is_active'   => $request->boolean('is_active'),
         ]);
 
         return response()->json(['message' => 'Kategori berhasil diperbarui!']);
