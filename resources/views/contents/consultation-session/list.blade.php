@@ -78,7 +78,11 @@
                             <div id="error-title" class="invalid-feedback d-block"></div>
                         </div>
 
-                        
+                        <div class="form-group mb-3 d-none">
+                            <label class="form-label fw-bold" for="session-slug">Slug <small class="text-muted">(opsional, otomatis dari judul jika kosong)</small></label>
+                            <input type="text" name="slug" id="session-slug" class="form-control" placeholder="contoh-slug-otomatis">
+                            <div id="error-slug" class="invalid-feedback d-block"></div>
+                        </div>
 
                         <div class="form-group mb-3">
                             <label class="form-label fw-bold" for="session-description">Deskripsi <span class="text-danger">*</span></label>

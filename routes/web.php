@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
     require __DIR__ . '/panel/ptk.php';
     require __DIR__ . '/panel/navbar.php';
     require __DIR__ . '/panel/gmeet.php';
+    require __DIR__ . '/panel/ppid.php';
 
 });
 

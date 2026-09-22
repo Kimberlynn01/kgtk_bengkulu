@@ -28,6 +28,8 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             UserSeeder::class,
             PtkMenuSeeder::class,
+            PpidMenuGroupSeeder::class,
+            InformasiBerkalaMenuSeeder::class,
         ]);
     }
 }
