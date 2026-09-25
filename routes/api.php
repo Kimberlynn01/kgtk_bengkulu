@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\LayananController;
 use App\Http\Controllers\Api\ProfilController;
+use App\Http\Controllers\Api\PpidController;
 use App\Http\Controllers\Api\PublikasiController;
 use App\Http\Controllers\Api\QnaController;
 use App\Http\Controllers\Api\StrukturOrganisasiController;
@@ -14,6 +15,10 @@ use App\Http\Controllers\Api\ProgramPeningkatanController;
 use App\Http\Controllers\Api\NavbarMenuController;
 use App\Http\Controllers\Api\PtkController;
 use App\Http\Controllers\Api\ConsultationSessionController;
+use App\Http\Controllers\Api\InformasiBerkalaController;
+use App\Http\Controllers\Api\PpidLayananInformasiController;
+use App\Http\Controllers\Api\PpidInformasiDikecualikanController;
+use App\Http\Controllers\Api\PpidDaftarInformasiPublikController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -84,6 +89,26 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::get('/consultation-session', [ConsultationSessionController::class, 'show']);
+
+    // Informasi Berkala
+    Route::get('/informasi-berkala', [InformasiBerkalaController::class, 'index']);
+    Route::get('/informasi-berkala/{id}', [InformasiBerkalaController::class, 'show']);
+
+    // PPID
+    Route::prefix('ppid')->group(function () {
+        Route::get('/visi-misi', [PpidController::class, 'getVisiMisi']);
+        Route::get('/tugas-fungsi', [PpidController::class, 'getTugasFungsi']);
+        
+        Route::get('/layanan-informasi', [PpidLayananInformasiController::class, 'index']);
+        Route::get('/layanan-informasi/{id}', [PpidLayananInformasiController::class, 'show']);
+
+        Route::get('/informasi-dikecualikan', [PpidInformasiDikecualikanController::class, 'index']);
+        Route::get('/informasi-dikecualikan/{id}', [PpidInformasiDikecualikanController::class, 'show']);
+
+        Route::get('/daftar-informasi-publik', [PpidDaftarInformasiPublikController::class, 'index']);
+        Route::get('/daftar-informasi-publik/{id}', [PpidDaftarInformasiPublikController::class, 'show']);
+
+    });
 
 
     Route::fallback(function () {

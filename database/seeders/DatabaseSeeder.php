@@ -30,6 +30,8 @@ class DatabaseSeeder extends Seeder
             PtkMenuSeeder::class,
             PpidMenuGroupSeeder::class,
             InformasiBerkalaMenuSeeder::class,
+            PpidNavbarMenuSeeder::class,
+            PpidMenuSeeder::class,
         ]);
     }
 }
